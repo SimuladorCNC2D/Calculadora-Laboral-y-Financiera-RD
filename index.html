@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Calculadora Laboral y Financiera RD v2.3.0 FrancOS 2.1</title>
+  <meta name="description" content="Calcula tu sueldo neto (AFP/ARS/ISR), presupuesto por período, tiempo laborado, vacaciones y doble sueldo en República Dominicana.">
+  <style>
+    /* ===== VARIABLES Y TEMAS ===== */
+    :root {
+      --bg-body:#f0f4f8; --bg-panel:#fff; --bg-editor:#f8fafc; --text-main:#1e293b; --text-muted:#64748b;
+      --border-color:#cbd5e1; --shadow:rgba(0,0,0,.08); --accent:#0f766e; --accent-bright:#14b8a6;
+      --danger:#dc2626; --warning:#d97706;
+      --btn-primary-bg:#0f766e; --btn-primary-text:#fff;
+      --btn-secondary-text:#0f766e; --btn-secondary-border:#0f766e;
+      --footer-bg:#fff; --footer-border:#cbd5e1; --status-dot-color:#22c55e;
+      --input-bg:#fff; --input-border:#cbd5e1; --tab-active-bg:#0f766e; --tab-active-text:#fff;
+      --tab-bg:#e2e8f0; --tab-text:#334155;
+      --color-gasto:#ef4444; --color-ahorro:#22c55e; --color-restante:#3b82f6; --color-deficit:#f59e0b;
+      --theme-btn-bg:rgba(255,255,255,.85); --theme-btn-color:#1e2a3a; --theme-btn-border:#d0d7de;
+    }
+    [data-theme="dark"] {
+      --bg-body:#0f172a; --bg-panel:#1e293b; --bg-editor:#0f172a; --text-main:#f1f5f9; --text-muted:#94a3b8;
+      --border-color:#334155; --shadow:rgba(0,0,0,.4); --accent:#2dd4bf; --accent-bright:#5eead4;
+      --danger:#f87171; --warning:#fbbf24;
+      --btn-primary-bg:#2dd4bf; --btn-primary-text:#0f172a;
+      --btn-secondary-text:#2dd4bf; --btn-secondary-border:#2dd4bf;
+      --footer-bg:#1e293b; --footer-border:#334155; --status-dot-color:#2dd4bf;
+      --input-bg:#0f172a; --input-border:#475569; --tab-active-bg:#2dd4bf; --tab-active-text:#0f172a;
+      --tab-bg:#1e293b; --tab-text:#cbd5e1;
+      --color-gasto:#f87171; --color-ahorro:#4ade80; --color-restante:#60a5fa; --color-deficit:#fbbf24;
+      --theme-btn-bg:rgba(30,30,36,.85); --theme-btn-color:#ffffff; --theme-btn-border:#44444f;
+    }
+    * { box-sizing:border-box; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+    body { margin:0; padding:20px; background:var(--bg-body); color:var(--text-main); display:flex; flex-direction:column; min-height:100vh; position:relative; transition:background .8s ease, color .3s; }
+
+    /* ===== CIELO / ESTRELLAS / DECORACIONES (calcado del simulador CNC) ===== */
+    .sky-overlay { position:fixed; top:0; left:0; width:100%; height:55vh; pointer-events:none; z-index:0; opacity:0; transition:opacity 1.2s ease; will-change:opacity; }
+    .sky-overlay.visible { opacity:1; }
+    .stars { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0; transition:opacity 1.2s ease; }
+    .stars.visible { opacity:1; }
+    .star { position:absolute; background:white; border-radius:50%; animation:twinkle 2s infinite alternate ease-in-out; }
+    @keyframes twinkle { 0%{opacity:.2;transform:scale(.8);} 100%{opacity:1;transform:scale(1.2);} }
+    .deco-icon { font-size:2.2rem; transition:opacity .6s ease, transform .6s cubic-bezier(.34,1.56,.64,1); opacity:0; transform:scale(.3) rotate(-20deg); display:inline-block; line-height:1; margin-right:4px; filter:drop-shadow(0 2px 8px rgba(255,215,0,.3)); }
+    .deco-icon.visible { opacity:1; transform:scale(1) rotate(0deg); }
+    .deco-icon.moon { filter:drop-shadow(0 2px 8px rgba(200,200,255,.2)); }
+    .deco-icon.fading { opacity:0 !important; transform:scale(.3) rotate(20deg) !important; }
+    .header-container, .tabs, .utility-bar, .container, .app-footer { position:relative; z-index:2; }
+
+    /* ===== HEADER ===== */
+    .header-container { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px; flex-wrap:wrap; gap:10px; }
+    .header-left h1 { margin:0 0 4px 0; font-size:24px; font-weight:600; letter-spacing:.3px; }
+    .header-left h1 .accent { color:var(--accent); transition:color .3s; }
+    .header-left .sub-label { color:var(--text-muted); font-size:13px; margin:0; }
+    .header-right { display:flex; align-items:center; gap:6px; margin-bottom:2px; }
+
+    /* ===== BOTÓN DE TEMA (idéntico al simulador CNC) ===== */
+    .theme-btn {
+      background:var(--theme-btn-bg); color:var(--theme-btn-color); border:1px solid var(--theme-btn-border);
+      padding:6px 12px; font-size:12px; border-radius:4px; backdrop-filter:blur(4px);
+      box-shadow:0 2px 6px rgba(0,0,0,.08); cursor:pointer;
+      transition:background .3s, border-color .3s, color .3s, box-shadow .3s;
+      font-weight:500; white-space:nowrap; display:flex; align-items:center; gap:4px;
+      overflow:hidden; position:relative; height:30px; line-height:1;
+    }
+    .theme-btn:hover { background:rgba(255,255,255,.2); box-shadow:0 2px 8px rgba(0,0,0,.15); }
+    .theme-text-wrapper { position:relative; display:inline-block; width:80px; height:1.2em; overflow:hidden; vertical-align:middle; }
+    .theme-text-wrapper span {
+      position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center;
+      transition:transform .4s cubic-bezier(.34,1.2,.64,1), opacity .4s ease; white-space:nowrap;
+    }
+    .theme-text-wrapper .theme-option { transform:translateY(0); opacity:1; }
+    .theme-text-wrapper .theme-option.hidden { transform:translateY(-120%); opacity:0; pointer-events:none; }
+    .theme-text-wrapper .theme-option.next { transform:translateY(120%); opacity:0; }
+    .theme-text-wrapper .theme-option.next.show { transform:translateY(0); opacity:1; }
+    .theme-icon { font-size:1.1rem; margin-right:2px; transition:transform .4s ease; }
+    .theme-btn.night .theme-icon { transform:rotate(10deg); }
+
+    /* ===== SELECTOR DE IDIOMA (con deslizador animado) ===== */
+    .lang-selector { position:relative; display:inline-flex; background:var(--bg-panel); border:1px solid var(--border-color); border-radius:4px; padding:2px; height:30px; align-items:center; }
+    .lang-selector button { width:34px; height:24px; padding:0; background:transparent; border:none; color:var(--text-muted); font-weight:600; font-size:11px; cursor:pointer; position:relative; z-index:1; transition:color .3s; border-radius:3px; }
+    .lang-selector button.active { color:var(--btn-primary-text); }
+    .lang-slider { position:absolute; top:2px; left:2px; width:34px; height:24px; background:var(--accent); border-radius:3px; z-index:0; transform:translateX(0); transition:transform .35s cubic-bezier(.34,1.2,.64,1), background .3s; }
+    .lang-selector[data-lang="en"] .lang-slider { transform:translateX(34px); }
+
+    /* ===== TABS ===== */
+    .tabs { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+    .tab-btn { background:var(--tab-bg); color:var(--tab-text); border:1px solid var(--border-color); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600; transition:all .2s; }
+    .tab-btn.active { background:var(--tab-active-bg); color:var(--tab-active-text); border-color:var(--tab-active-bg); }
+
+    .utility-bar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; padding:8px 10px; background:var(--bg-panel); border:1px solid var(--border-color); border-radius:8px; box-shadow:0 2px 8px var(--shadow); }
+    .util-btn { background:transparent; color:var(--text-main); border:1px solid var(--border-color); padding:6px 12px; font-size:12px; font-weight:500; border-radius:5px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:all .15s; }
+    .util-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .util-btn.util-danger:hover { border-color:var(--danger); color:var(--danger); }
+
+    .tab-content { display:none; }
+    .tab-content.active { display:flex; flex-direction:column; gap:14px; }
+    .container { flex:1; max-width:1200px; width:100%; margin:0 auto; }
+    .card { background:var(--bg-panel); border:1px solid var(--border-color); border-radius:8px; padding:16px 18px; box-shadow:0 2px 8px var(--shadow); transition:background .3s, border-color .3s; }
+    .card h2 { margin:0 0 12px 0; font-size:16px; font-weight:600; border-bottom:1px solid var(--border-color); padding-bottom:8px; }
+    .card h3.sub { margin:16px 0 8px 0; font-size:14px; font-weight:600; color:var(--text-muted); }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .form-group { display:flex; flex-direction:column; gap:4px; }
+    .form-group label, .form-group .lbl { font-size:12px; font-weight:600; color:var(--text-muted); }
+    .form-group input, .form-group select, .inline-input { background:var(--input-bg); color:var(--text-main); border:1px solid var(--input-border); border-radius:5px; padding:8px 10px; font-size:13px; outline:none; transition:border-color .2s; width:100%; }
+    .form-group input:focus, .form-group select:focus, .inline-input:focus { border-color:var(--accent); }
+    input:disabled, select:disabled { opacity:.55; cursor:not-allowed; }
+    .deduct-grid { margin-top:12px; padding-top:12px; border-top:1px dashed var(--border-color); }
+    .deduct-item { display:flex; flex-direction:column; gap:4px; }
+    .chk { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--text-muted); cursor:pointer; }
+    .chk input { width:auto; accent-color:var(--accent); cursor:pointer; }
+    .pct-row { display:flex; align-items:center; gap:6px; }
+    .pct-row span { color:var(--text-muted); font-size:12px; }
+
+    .btn { border:none; padding:9px 16px; font-size:13px; font-weight:600; border-radius:5px; cursor:pointer; transition:filter .15s, transform .1s; background:var(--btn-primary-bg); color:var(--btn-primary-text); text-decoration:none; display:inline-block; }
+    .btn:hover { filter:brightness(1.05); }
+    .btn:active { transform:scale(.98); }
+    .btn-secondary { background:transparent; color:var(--btn-secondary-text); border:1px solid var(--btn-secondary-border); padding:8px 14px; font-size:13px; font-weight:600; border-radius:5px; cursor:pointer; transition:all .15s; }
+    .btn-secondary:hover { background:var(--accent); color:var(--btn-primary-text); }
+    .btn-secondary.on { background:var(--accent); color:var(--btn-primary-text); }
+    .gastos-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; padding-top:12px; border-top:1px dashed var(--border-color); }
+
+    /* ===== PERÍODOS (todos desplegados) ===== */
+    .period-sections { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px; }
+    .period-section { background:var(--bg-editor); border:1px solid var(--border-color); border-radius:8px; padding:12px; }
+    .period-title { margin:0 0 10px 0; font-size:13px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.5px; padding-bottom:6px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; gap:8px; }
+    .period-title small { color:var(--text-muted); font-weight:600; text-transform:none; letter-spacing:0; }
+    .expense-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:8px; }
+    .expense-card { position:relative; background:var(--bg-panel); border:1px solid var(--border-color); border-radius:6px; padding:8px 10px; transition:border-color .15s, box-shadow .15s; }
+    .expense-card:hover { border-color:var(--accent); box-shadow:0 2px 6px rgba(0,0,0,.08); }
+    .expense-card .expense-name { width:100%; background:transparent; border:none; border-bottom:1px dashed transparent; color:var(--text-muted); font-size:11px; font-weight:600; padding:2px 0; margin-bottom:4px; outline:none; cursor:text; transition:border-color .15s, color .15s; text-overflow:ellipsis; }
+    .expense-card .expense-name::placeholder { color:var(--text-muted); font-style:italic; opacity:.7; }
+    .expense-card:hover .expense-name, .expense-card .expense-name:focus { border-bottom-color:var(--border-color); color:var(--text-main); }
+    .expense-card .expense-name:focus { border-bottom-color:var(--accent); }
+    .expense-card .expense-value { width:100%; background:transparent; border:none; color:var(--text-main); font-size:15px; font-weight:700; padding:2px 0; outline:none; font-variant-numeric:tabular-nums; -moz-appearance:textfield; }
+    .expense-card .expense-value::-webkit-outer-spin-button, .expense-card .expense-value::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+    .expense-delete { position:absolute; top:-6px; right:-6px; width:20px; height:20px; padding:0; border:none; background:var(--danger); color:#fff; border-radius:50%; cursor:pointer; font-size:14px; line-height:1; display:flex; align-items:center; justify-content:center; opacity:0; transform:scale(.7); transition:opacity .15s, transform .15s; z-index:2; font-weight:700; }
+    .expense-card:hover .expense-delete { opacity:1; transform:scale(1); }
+    .expense-add-slot { background:transparent; border:1.5px dashed var(--border-color); border-radius:6px; color:var(--text-muted); cursor:pointer; min-height:76px; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:300; transition:all .2s; opacity:.5; width:100%; }
+    .expense-add-slot:hover { opacity:1; border-color:var(--accent); color:var(--accent); background:var(--bg-panel); }
+
+    /* ===== RESULTADOS ===== */
+    .result-box { background:var(--bg-editor); border:1px solid var(--border-color); border-radius:6px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; transition:border-color .3s; }
+    .result-row { display:flex; justify-content:space-between; font-size:13px; padding:3px 0; border-bottom:1px dashed var(--border-color); gap:8px; }
+    .result-row:last-child { border-bottom:none; }
+    .result-row .label { color:var(--text-muted); }
+    .result-row .value { font-weight:700; color:var(--text-main); font-variant-numeric:tabular-nums; text-align:right; }
+    .result-row .value.positive { color:var(--accent); }
+    .result-row .value.negative { color:var(--danger); }
+    .result-row.total-row { font-size:15px; font-weight:700; padding-top:6px; border-top:2px solid var(--border-color); border-bottom:none; }
+    .result-row.sep { margin-top:6px; border-top:1px solid var(--border-color); padding-top:8px; }
+
+    /* Gráfico de pastel SVG */
+    .chart-box { background:var(--bg-editor); border:1px solid var(--border-color); border-radius:6px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:10px; position:relative; }
+    .donut { width:100%; max-width:250px; height:auto; overflow:visible; }
+    .donut .slice { fill:none; stroke-width:28; cursor:pointer; transition:stroke-width .18s ease, opacity .18s ease; }
+    .donut .slice.hov { stroke-width:36; }
+    .donut.has-hover .slice:not(.hov) { opacity:.3; }
+    .donut text { text-anchor:middle; fill:var(--text-main); pointer-events:none; }
+    .donut .d-big { font-size:13px; font-weight:700; }
+    .donut .d-sm { font-size:9.5px; fill:var(--text-muted); }
+    .chart-legend { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; font-size:11.5px; }
+    .legend-item { display:flex; align-items:center; gap:5px; padding:3px 8px; border-radius:4px; border:1px solid transparent; transition:background .15s, border-color .15s, opacity .15s; cursor:default; }
+    .legend-item.hov { background:var(--bg-panel); border-color:var(--border-color); font-weight:700; }
+    .chart-legend.has-hover .legend-item:not(.hov) { opacity:.45; }
+    .legend-dot { display:inline-block; width:10px; height:10px; border-radius:50%; }
+    .chart-tooltip { position:fixed; background:var(--bg-panel); color:var(--text-main); border:1px solid var(--border-color); border-radius:6px; padding:6px 10px; font-size:12px; pointer-events:none; box-shadow:0 4px 12px rgba(0,0,0,.2); z-index:200; opacity:0; transition:opacity .15s; font-weight:600; white-space:nowrap; }
+    .chart-tooltip.visible { opacity:1; }
+
+    /* Barras comparativas por período */
+    .bars { display:flex; flex-direction:column; gap:10px; margin-top:6px; }
+    .bar-row { display:grid; grid-template-columns:140px 1fr; gap:10px; align-items:center; font-size:12px; }
+    .bar-row .bar-name { font-weight:600; color:var(--text-main); }
+    .bar-track { display:flex; height:22px; background:var(--bg-editor); border:1px solid var(--border-color); border-radius:4px; overflow:hidden; }
+    .bar-seg { height:100%; transition:width .3s ease, opacity .15s; min-width:0; }
+    .bar-meta { grid-column:2; font-size:11px; color:var(--text-muted); margin-top:-6px; }
+
+    table.data-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+    table.data-table th, table.data-table td { border:1px solid var(--border-color); padding:6px 8px; text-align:left; }
+    table.data-table th { background:var(--bg-editor); color:var(--text-muted); font-weight:600; }
+    table.data-table tr:nth-child(even) { background:var(--bg-editor); }
+    table.data-table td.num { text-align:right; font-variant-numeric:tabular-nums; }
+    table.data-table tr.next-holiday td { background:rgba(45,212,191,.16); font-weight:700; }
+    table.data-table tr.past td { opacity:.55; }
+    .table-scroll { overflow-x:auto; margin-top:6px; }
+    .year-switch { display:flex; gap:6px; margin:10px 0; }
+
+    .link-card { display:flex; align-items:center; justify-content:space-between; background:var(--bg-editor); border:1px solid var(--border-color); border-radius:6px; padding:12px 14px; margin-top:8px; flex-wrap:wrap; gap:10px; }
+    .link-card .link-text strong { display:block; font-size:13px; color:var(--text-main); margin-bottom:2px; }
+    .link-card .link-text p { margin:0; font-size:12px; color:var(--text-muted); }
+    .link-card a.btn, .link-card a.btn span { color:var(--btn-primary-text) !important; text-decoration:none !important; }
+    .info-note { font-size:11.5px; color:var(--text-muted); line-height:1.5; margin-top:8px; padding:8px 10px; background:var(--bg-editor); border-left:3px solid var(--accent); border-radius:4px; }
+
+    .history-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--border-color); }
+    .history-header h2 { margin:0; border:none; padding:0; font-size:16px; }
+    .btn-link-danger { background:none; border:none; color:var(--text-muted); font-size:11.5px; cursor:pointer; padding:4px 6px; border-radius:4px; transition:color .15s, background .15s; }
+    .btn-link-danger:hover { color:var(--danger); background:rgba(220,38,38,.08); }
+    .history-item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 10px; background:var(--bg-editor); border:1px solid var(--border-color); border-radius:5px; margin-bottom:6px; font-size:12px; flex-wrap:wrap; }
+    .history-item .hist-meta { color:var(--text-muted); }
+    .history-item .hist-values { display:flex; gap:12px; flex-wrap:wrap; }
+    .history-item .hist-values span { font-weight:600; }
+    .empty-state { color:var(--text-muted); font-size:12.5px; text-align:center; padding:14px; font-style:italic; }
+
+    /* ===== FOOTER ===== */
+    .app-footer { margin-top:16px; padding:10px 16px; background:var(--footer-bg); border-top:1px solid var(--footer-border); border-radius:6px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 20px; font-size:12px; color:var(--text-muted); transition:background .3s, border-color .3s; }
+    .footer-left, .footer-right { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .app-footer a { color:var(--text-muted); text-decoration:none; cursor:pointer; border-bottom:1px dotted transparent; transition:color .2s, border-color .2s; }
+    .app-footer a:hover { color:var(--accent); border-bottom-color:var(--accent); }
+    .app-footer .version { font-weight:600; color:var(--text-main); font-size:11px; background:var(--bg-editor); padding:2px 8px; border-radius:10px; border:1px solid var(--border-color); }
+    .status-indicator { display:flex; align-items:center; gap:5px; font-size:11px; }
+    .status-dot { display:inline-block; width:8px; height:8px; background:var(--status-dot-color); border-radius:50%; animation:pulse-dot 1.5s ease-in-out infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:.6;transform:scale(.9);} 50%{opacity:1;transform:scale(1.2);} }
+    .powered-hint { font-size:11px; color:var(--text-muted); font-weight:500; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(3px); z-index:1000; display:none; justify-content:center; align-items:center; padding:20px; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { background:var(--bg-panel); color:var(--text-main); border-radius:8px; max-width:600px; width:100%; max-height:80vh; overflow-y:auto; padding:22px 26px; box-shadow:0 20px 60px rgba(0,0,0,.3); border:1px solid var(--border-color); position:relative; }
+    .modal-box h2 { margin-top:0; border-bottom:1px solid var(--border-color); padding-bottom:10px; font-size:18px; }
+    .modal-box .close-btn { position:absolute; top:10px; right:16px; font-size:24px; cursor:pointer; background:none; border:none; color:var(--text-muted); }
+    .modal-box .close-btn:hover { color:var(--danger); }
+    .modal-content p, .modal-content li { line-height:1.6; font-size:13.5px; }
+    .modal-content ul { padding-left:20px; }
+    .modal-content a { color:var(--accent); }
+    .modal-content .github-profile { display:inline-flex; align-items:center; gap:8px; background:var(--bg-editor); padding:6px 14px; border-radius:20px; border:1px solid var(--border-color); margin-top:8px; }
+
+    @media (max-width:900px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr; }
+      .header-container { flex-direction:column; align-items:flex-start; }
+      .header-right { width:100%; justify-content:flex-start; flex-wrap:wrap; }
+      .theme-btn { order:-1; }
+      .app-footer { flex-direction:column; align-items:stretch; }
+      .footer-left, .footer-right { justify-content:center; }
+      .bar-row { grid-template-columns:1fr; } .bar-meta { grid-column:1; margin-top:0; }
+    }
+    @media (max-width:600px) {
+      body { padding:10px; }
+      .header-left h1 { font-size:19px; }
+      .tab-btn { font-size:11px; padding:6px 10px; }
+      .card { padding:12px; }
+      .expense-grid { grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); }
+      .theme-btn { font-size:10px; padding:4px 8px; height:26px; }
+      .theme-text-wrapper { width:60px; }
+      .deco-icon { font-size:1.8rem; }
+    }
+    @media print {
+      .sky-overlay, .stars, .utility-bar, .tabs, .app-footer, .header-right, .gastos-actions { display:none !important; }
+      .tab-content { display:flex !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sky-overlay" id="skyOverlay"></div>
+  <div class="stars" id="starsContainer" aria-hidden="true"></div>
+
+  <header class="header-container">
+    <div class="header-left">
+      <h1 id="mainTitle">Calculadora Laboral y Financiera <span class="accent">RD</span></h1>
+      <p class="sub-label" id="subLabel">Sueldo neto, presupuesto y herramientas laborales.</p>
+    </div>
+    <div class="header-right">
+      <span class="deco-icon sun" id="decoSun" aria-hidden="true">☀️</span>
+      <span class="deco-icon moon" id="decoMoon" aria-hidden="true">🌙</span>
+      <button class="theme-btn" id="btnTheme" aria-label="Cambiar entre modo día y noche">
+        <span class="theme-icon" id="themeIcon">🌙</span>
+        <span class="theme-text-wrapper" id="themeTextWrapper">
+          <span class="theme-option" id="themeTextDay">Modo Día</span>
+          <span class="theme-option hidden" id="themeTextNight">Modo Noche</span>
+        </span>
+      </button>
+      <div class="lang-selector" id="langSelector" data-lang="es">
+        <span class="lang-slider"></span>
+        <button class="active" data-lang="es" type="button">ES</button>
+        <button data-lang="en" type="button">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="tab-sueldo">💰 <span data-t="tabSueldo">Sueldo y Presupuesto</span></button>
+    <button class="tab-btn" data-tab="tab-herramientas">🧰 <span data-t="tabHerramientas">Herramientas Laborales</span></button>
+    <button class="tab-btn" data-tab="tab-feriados">📅 <span data-t="tabFeriados">Feriados y Enlaces</span></button>
+  </nav>
+
+  <div class="utility-bar" id="utilityBar">
+    <button class="util-btn" id="btnReadonly" onclick="toggleReadonly()">🔒 <span data-t="btnReadonlyOff">Modo lectura: OFF</span></button>
+    <button class="util-btn" onclick="saveSnapshot()">💾 <span data-t="btnSaveSnapshot">Guardar en historial</span></button>
+    <button class="util-btn" onclick="exportCSV()">📥 <span data-t="btnExportCSV">Exportar CSV</span></button>
+    <button class="util-btn" onclick="window.print()">🖨️ <span data-t="btnPrint">Imprimir / PDF</span></button>
+    <button class="util-btn" onclick="loadExample()">✨ <span data-t="btnLoadExample">Cargar ejemplo</span></button>
+    <button class="util-btn util-danger" onclick="clearAll()">🧹 <span data-t="btnClearAll">Limpiar todo</span></button>
+  </div>
+
+  <main class="container">
+
+    <!-- ===== TAB 1: SUELDO ===== -->
+    <section id="tab-sueldo" class="tab-content active">
+
+      <div class="card">
+        <h2 data-t="titleSueldo">1. Configuración del Sueldo</h2>
+        <div class="grid-4">
+          <div class="form-group">
+            <label for="salarioBruto" data-t="labelSalario">Salario bruto por período (RD$)</label>
+            <input type="number" id="salarioBruto" value="0" min="0" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="frecuencia" data-t="labelFrecuencia">Frecuencia</label>
+            <select id="frecuencia">
+              <option value="mensual" data-t="optMensual">Mensual (1 período)</option>
+              <option value="quincenal" data-t="optQuincenal">Quincenal (2 períodos)</option>
+              <option value="semanal" data-t="optSemanal">Semanal (4 períodos)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="bonoDia" data-t="labelBonoDia">Día del bono</label>
+            <input type="number" id="bonoDia" value="15" min="1" max="31" step="1">
+          </div>
+          <div class="form-group">
+            <label for="bonoMonto" data-t="labelBonoMonto">Monto del bono (RD$)</label>
+            <input type="number" id="bonoMonto" value="0" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="grid-4 deduct-grid">
+          <div class="deduct-item">
+            <label class="chk"><input type="checkbox" id="useAfp"> <span data-t="chkAfp">Descontar AFP (pensión)</span></label>
+            <div class="pct-row"><input class="inline-input" type="number" id="afpPct" min="0" max="100" step="0.01"><span>%</span></div>
+          </div>
+          <div class="deduct-item">
+            <label class="chk"><input type="checkbox" id="useArs"> <span data-t="chkArs">Descontar ARS / SFS (salud)</span></label>
+            <div class="pct-row"><input class="inline-input" type="number" id="arsPct" min="0" max="100" step="0.01"><span>%</span></div>
+          </div>
+          <div class="deduct-item">
+            <label class="chk"><input type="checkbox" id="useIsr"> <span data-t="chkIsr">Calcular ISR (DGII)</span></label>
+            <select class="inline-input" id="isrYear">
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
+          <div class="deduct-item">
+            <span class="chk" style="cursor:default" data-t="lblDedTotal">Descuento de ley aplicado</span>
+            <strong id="dedTotalPct" style="font-size:18px; color:var(--accent);">0%</strong>
+          </div>
+        </div>
+        <div class="info-note" id="deductNote"></div>
+      </div>
+
+      <div class="card">
+        <h2 data-t="titleGastos">2. Gastos de los Períodos</h2>
+        <div class="period-sections" id="expenseSections"></div>
+        <div class="gastos-actions">
+          <button class="btn-secondary" onclick="resetExpenses()" data-t="btnResetGastos">Restablecer gastos</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 data-t="titleResultados">3. Resultados</h2>
+        <div class="grid-2">
+          <div class="result-box" id="resultBox"></div>
+          <div class="chart-box" id="chartBox">
+            <div id="chartHolder" style="width:100%; display:flex; justify-content:center;"></div>
+            <div class="chart-legend" id="chartLegend"></div>
+          </div>
+        </div>
+        <h3 class="sub" data-t="titleBarras">Distribución por período</h3>
+        <div class="bars" id="barsBox"></div>
+        <h3 class="sub" data-t="titleComparacion">Comparación de Períodos</h3>
+        <div class="table-scroll"><table class="data-table" id="comparisonTable"></table></div>
+      </div>
+
+      <div class="card" id="historyCard">
+        <div class="history-header">
+          <h2 data-t="titleHistorial">Historial de Cálculos</h2>
+          <button class="btn-link-danger" onclick="clearHistory()" data-t="btnClearHistory">Vaciar todo</button>
+        </div>
+        <div id="historyList"></div>
+      </div>
+    </section>
+
+    <!-- ===== TAB 2: HERRAMIENTAS ===== -->
+    <section id="tab-herramientas" class="tab-content">
+
+      <div class="card">
+        <h2 data-t="titleTiempo">Tiempo Laborando</h2>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="fechaIngreso" data-t="labelFechaIngreso">Fecha de ingreso</label>
+            <input type="date" id="fechaIngreso">
+          </div>
+          <div class="form-group">
+            <label for="fechaSalida" data-t="labelFechaSalida">Fecha de salida (opcional)</label>
+            <input type="date" id="fechaSalida">
+          </div>
+        </div>
+        <div class="result-box" style="margin-top:10px;">
+          <div class="result-row"><span class="label" data-t="resLabelTiempoTotal">Tiempo total laborado</span><span class="value" id="resTiempoTotal">—</span></div>
+          <div class="result-row"><span class="label" data-t="resLabelDiasTotal">Días totales</span><span class="value" id="resDiasTotal">—</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 data-t="titleVacaciones">Vacaciones Proporcionales</h2>
+        <div class="grid-3">
+          <div class="form-group">
+            <label for="vacFechaIngreso" data-t="labelVacIngreso">Fecha de ingreso</label>
+            <input type="date" id="vacFechaIngreso">
+          </div>
+          <div class="form-group">
+            <label for="vacFechaSalida" data-t="labelVacSalida">Fecha de corte (opcional)</label>
+            <input type="date" id="vacFechaSalida">
+          </div>
+          <div class="form-group">
+            <label for="vacSalario" data-t="labelVacSalario">Salario mensual (RD$)</label>
+            <input type="number" id="vacSalario" value="" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="result-box" style="margin-top:10px;">
+          <div class="result-row"><span class="label" data-t="resLabelAntig">Antigüedad</span><span class="value" id="resAntigVac">—</span></div>
+          <div class="result-row"><span class="label" data-t="resLabelDiasVac">Días de vacaciones</span><span class="value" id="resDiasVac">—</span></div>
+          <div class="result-row"><span class="label" data-t="resLabelDiario">Salario diario (÷ 23.83)</span><span class="value" id="resDiarioVac">—</span></div>
+          <div class="result-row total-row"><span class="label" data-t="resLabelMontoVac">Monto estimado</span><span class="value positive" id="resMontoVac">—</span></div>
+        </div>
+        <div class="info-note" data-t="notaVacaciones"></div>
+      </div>
+
+      <div class="card">
+        <h2 data-t="titleDobleSueldo">Doble Sueldo / Regalía Pascual</h2>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="dsSalario" data-t="labelDsSalario">Salario mensual promedio (RD$)</label>
+            <input type="number" id="dsSalario" value="" min="0" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="dsMeses" data-t="labelDsMeses">Meses trabajados en el año</label>
+            <input type="number" id="dsMeses" value="12" min="0" max="12" step="0.01">
+          </div>
+        </div>
+        <div class="result-box" style="margin-top:10px;">
+          <div class="result-row total-row"><span class="label" data-t="resLabelRegalia">Regalía pascual estimada</span><span class="value positive" id="resRegalia">—</span></div>
+        </div>
+        <div class="info-note" data-t="notaDobleSueldo"></div>
+      </div>
+
+      <div class="card">
+        <h2 data-t="titleTss">Calculadora de Descuentos AFP / ARS</h2>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="tssSalario" data-t="labelTssSalario">Salario bruto (RD$)</label>
+            <input type="number" id="tssSalario" value="" min="0" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="tssFreq" data-t="labelFrecuencia">Frecuencia</label>
+            <select id="tssFreq">
+              <option value="mensual" data-t="freqMensual">Mensual</option>
+              <option value="quincenal" data-t="freqQuincenal">Quincenal</option>
+              <option value="semanal" data-t="freqSemanal">Semanal</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-scroll"><table class="data-table" id="tssTable"></table></div>
+        <div class="info-note" id="tssNote"></div>
+      </div>
+
+      <div class="card">
+        <h2 data-t="titleCesantia">Cesantía y Prestaciones Laborales</h2>
+        <div class="link-card">
+          <div class="link-text">
+            <strong data-t="textoCesantia">¿Necesitas calcular tu cesantía o prestaciones?</strong>
+            <p data-t="textoCesantiaDesc">Usa la calculadora oficial del Ministerio de Trabajo.</p>
+          </div>
+          <a href="https://mt.gob.do/" target="_blank" rel="noopener" class="btn"><span data-t="btnCesantia">Ir al Ministerio de Trabajo →</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TAB 3: FERIADOS ===== -->
+    <section id="tab-feriados" class="tab-content">
+      <div class="card">
+        <h2 data-t="titleFeriados">Calendario de Feriados (República Dominicana)</h2>
+        <p style="font-size:13px; color:var(--text-muted); margin-top:0;" data-t="textoFeriadosIntro"></p>
+        <div class="link-card">
+          <div class="link-text">
+            <strong data-t="textoCalendario">Calendario digital de feriados</strong>
+            <p data-t="textoCalendarioDesc"></p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a href="https://calendar.google.com/calendar/embed?src=es.do%23holiday%40group.v.calendar.google.com&ctz=America%2FSanto_Domingo" target="_blank" rel="noopener" class="btn"><span data-t="btnCalendario">Abrir calendario digital →</span></a>
+            <a href="https://mt.gob.do/" target="_blank" rel="noopener" class="btn"><span data-t="btnMinTrabajo">Ministerio de Trabajo →</span></a>
+          </div>
+        </div>
+        <div class="year-switch" id="yearSwitch"></div>
+        <div class="table-scroll"><table class="data-table" id="tablaFeriados"></table></div>
+        <div class="info-note" data-t="notaFeriados"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-left">
+      <span class="version" id="versionTag">v2.3.0</span>
+      <span class="status-indicator"><span class="status-dot"></span><span id="statusText" data-t="statusText">Sistemas estables</span></span>
+      <span>|</span>
+      <a onclick="abrirModal('terms')" data-t="footerTerms">Términos</a>
+      <span>|</span>
+      <a onclick="abrirModal('about')" data-t="footerAbout">Acerca de</a>
+      <span>|</span>
+      <a onclick="abrirModal('ideas')" data-t="footerIdeas">Ideas</a>
+      <span>|</span>
+      <a href="mailto:francos.dev@outlook.com?subject=Calculadora%20Laboral%20RD" data-t="footerContact">Contacto</a>
+    </div>
+    <div class="footer-right">
+      <span class="powered-hint">Powered by FrancOS 2.1</span>
+      <a href="https://github.com/SimuladorCNC2D" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+      <a href="mailto:francos.dev@outlook.com?subject=Bug%20en%20Calculadora%20Laboral%20RD" data-t="footerReport">Reportar bug</a>
+    </div>
+  </footer>
+
+  <div class="chart-tooltip" id="chartTooltip"></div>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) cerrarModal()">
+    <div class="modal-box">
+      <button class="close-btn" onclick="cerrarModal()" aria-label="Close">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // ===================================================================
+    //  CALCULADORA LABORAL Y FINANCIERA RD — FrancOS 2.1
+    // ===================================================================
+    const VERSION = '2.3.0';
+    const STORAGE_KEY = 'francos_calc_rd_v5';
+    const $ = id => document.getElementById(id);
+
+    // ============ TRADUCCIONES ============
+    const GH_SVG = '<svg viewBox="0 0 16 16" width="22" height="22"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
+    const T = {
+      es: {
+        title:'Calculadora Laboral y Financiera', titleAccent:'RD',
+        subLabel:'Sueldo neto, presupuesto y herramientas laborales.',
+        themeDay:'Modo Día', themeNight:'Modo Noche',
+        tabSueldo:'Sueldo y Presupuesto', tabHerramientas:'Herramientas Laborales', tabFeriados:'Feriados y Enlaces',
+        titleSueldo:'1. Configuración del Sueldo',
+        labelSalario:'Salario bruto por período (RD$)', labelFrecuencia:'Frecuencia',
+        optMensual:'Mensual (1 período)', optQuincenal:'Quincenal (2 períodos)', optSemanal:'Semanal (4 períodos)',
+        freqMensual:'Mensual', freqQuincenal:'Quincenal', freqSemanal:'Semanal',
+        labelBonoDia:'Día del bono', labelBonoMonto:'Monto del bono (RD$)',
+        chkAfp:'Descontar AFP (pensión)', chkArs:'Descontar ARS / SFS (salud)', chkIsr:'Calcular ISR (DGII)',
+        lblDedTotal:'Descuento de ley aplicado',
+        noteDeduct:(o)=> 'Descuentos activos: ' + (o.parts.length ? o.parts.join(' + ') + ' = <strong>' + o.total + '%</strong> sobre el salario bruto (con los topes de cotización de la TSS)' : '<strong>ninguno</strong> (el salario se toma tal cual)') + '. ' +
+          (o.isr ? 'ISR: escala DGII ' + o.year + ', calculado sobre el ingreso anual proyectado (bruto − AFP − ARS + bonos). ' : 'El ISR está desactivado. ') +
+          'El bono se suma al neto del período que contiene el día indicado y no lleva descuentos de AFP/ARS.',
+        btnReadonlyOff:'Modo lectura: OFF', btnReadonlyOn:'Modo lectura: ON',
+        btnSaveSnapshot:'Guardar en historial', btnExportCSV:'Exportar CSV', btnPrint:'Imprimir / PDF',
+        btnLoadExample:'Cargar ejemplo', btnClearAll:'Limpiar todo',
+        titleGastos:'2. Gastos de los Períodos', btnResetGastos:'Restablecer gastos',
+        titleResultados:'3. Resultados (total de todos los períodos)', titleBarras:'Distribución por período', titleComparacion:'Comparación de Períodos', titleHistorial:'Historial de Cálculos',
+        btnClearHistory:'Vaciar todo',
+        resSalarioBruto:'Salario bruto total', resAFP:(p)=>'AFP total (' + p + '%)', resARS:(p)=>'ARS / SFS total (' + p + '%)',
+        resISR:'ISR estimado total', resBono:'Bono total (períodos con bono)',
+        resNeto:'Salario neto total', resTotalGastos:'Total gastos', resAhorro:'Ahorro',
+        resGastosReales:'Gastos reales (sin ahorro)', resRestante:'Restante total',
+        resEquivMensual:'Equivalente mensual (bruto)', resEquivAnual:'Equivalente anual (bruto)', resISRAnual:'ISR estimado anual',
+        chartGastos:'Gastos', chartAhorro:'Ahorro', chartRestante:'Restante', chartDeficit:'Déficit', chartTotal:'Total', chartEmpty:'Sin datos', chartOfTotal:'del total',
+        barNeto:'Neto', barSobrante:'Sobrante', barFaltante:'Falta',
+        colPeriodo:'Período', colBruto:'Bruto', colAFP:'AFP/ARS', colISR:'ISR', colBono:'Bono',
+        colNeto:'Neto', colGastos:'Gastos', colRestante:'Restante', rowTotal:'Total',
+        histEmpty:'Aún no has guardado cálculos. Pulsa "Guardar en historial" para añadir uno.',
+        titleTiempo:'Tiempo Laborando',
+        labelFechaIngreso:'Fecha de ingreso', labelFechaSalida:'Fecha de salida (opcional)',
+        resLabelTiempoTotal:'Tiempo total laborado', resLabelDiasTotal:'Días totales',
+        titleVacaciones:'Vacaciones Proporcionales',
+        labelVacIngreso:'Fecha de ingreso', labelVacSalida:'Fecha de corte (opcional)', labelVacSalario:'Salario mensual (RD$)',
+        resLabelAntig:'Antigüedad', resLabelDiasVac:'Días de vacaciones', resLabelDiario:'Salario diario (÷ 23.83)', resLabelMontoVac:'Monto estimado',
+        notaVacaciones:'14 días laborables tras 1 año de servicio y 18 días a partir de los 5 años (Art. 177). Con menos de 1 año se aplica la escala proporcional (Art. 180): más de 5 meses = 6 días, más de 6 = 7 … más de 11 = 12. Salario diario = mensual ÷ 23.83.',
+        noVacYet:'Aún no cumple 5 meses', daysWord:(n)=> n + (n===1?' día':' días'),
+        titleDobleSueldo:'Doble Sueldo / Regalía Pascual',
+        labelDsSalario:'Salario mensual promedio (RD$)', labelDsMeses:'Meses trabajados en el año',
+        resLabelRegalia:'Regalía pascual estimada',
+        notaDobleSueldo:'La regalía equivale a la duodécima parte (÷ 12) de los salarios ordinarios devengados en el año. Se paga a más tardar el 20 de diciembre y está exenta de ISR.',
+        titleTss:'Calculadora de Descuentos AFP / ARS', labelTssSalario:'Salario bruto (RD$)',
+        tssRowBruto:'Salario bruto', tssRowAfp:(p)=>'AFP (' + p + '%)', tssRowArs:(p)=>'ARS / SFS (' + p + '%)', tssRowIsr:'ISR estimado',
+        tssRowTotal:'Total descuentos', tssRowNeto:'Salario neto', tssColMes:'Mensual', tssColAnio:'Anual', tssEmployer:'Aporte patronal (informativo)',
+        tssRowEmpAfp:'AFP patronal (7.10%)', tssRowEmpSfs:'SFS patronal (7.09%)',
+        tssNote:(o)=>'Porcentajes del trabajador: AFP ' + o.afp + '% y ARS/SFS ' + o.ars + '% (editables arriba). Topes mensuales de cotización TSS 2026: AFP ' + o.capAfp + ' y SFS ' + o.capSfs + ' (salario mínimo cotizable RD$23,223). El aporte patronal no se descuenta de tu sueldo.',
+        titleCesantia:'Cesantía y Prestaciones Laborales',
+        textoCesantia:'¿Necesitas calcular tu cesantía o prestaciones?',
+        textoCesantiaDesc:'Consulta el portal del Ministerio de Trabajo de República Dominicana.',
+        btnCesantia:'Ir al Ministerio de Trabajo →',
+        titleFeriados:'Calendario de Feriados (República Dominicana)',
+        textoFeriadosIntro:'Consulta los feriados oficiales. Abre el calendario digital o revisa la lista de referencia de abajo.',
+        textoCalendario:'Calendario digital de feriados',
+        textoCalendarioDesc:'Calendario de Google con los días festivos de República Dominicana.',
+        btnCalendario:'Abrir calendario digital →', btnMinTrabajo:'Ministerio de Trabajo →',
+        thFecha:'Fecha', thFeriado:'Feriado', thDia:'Día', thNota:'Nota',
+        noteMoved:(d)=>'Trasladado desde el ' + d, noteFixed:'Fecha fija', noteWeekend:'Cae en fin de semana (no se mueve)', nextHoliday:'Próximo feriado',
+        notaFeriados:'Lista de referencia según la Ley 139-97 y los calendarios publicados por el Ministerio de Trabajo. Confirma siempre las fechas en la fuente oficial.',
+        statusText:'Sistemas estables', footerTerms:'Términos', footerAbout:'Acerca de', footerContact:'Contacto', footerIdeas:'Ideas', footerReport:'Reportar bug',
+        confirmFreq:'Cambiar la frecuencia reiniciará los gastos con los valores por defecto de la nueva frecuencia. ¿Continuar?',
+        confirmClearAll:'¿Borrar todos los datos y volver a cero?',
+        confirmClearHistory:'¿Vaciar todo el historial?',
+        confirmResetExpenses:'¿Restablecer TODOS los gastos de TODOS los períodos a los valores por defecto?',
+        exampleLoaded:'Ejemplo cargado (basado en tu hoja de Excel). Edita los valores a tu gusto.',
+        snapshotSaved:'Cálculo guardado en el historial.',
+        invalidDate:'Fecha inválida',
+        placeholderName:'Nombre del gasto', addExpense:'Agregar gasto', removeExpense:'Eliminar gasto',
+        periodMes:'Mes', periodQuincena:(n)=>'Quincena ' + n + (n===1?' (días 1-15)':' (días 16-31)'), periodSemana:(n)=>'Semana ' + n,
+        yearS:(n)=> n + (n===1?' año':' años'), monthS:(n)=> n + (n===1?' mes':' meses'), dayS:(n)=> n + (n===1?' día':' días'),
+        csvPeriodo:'Período', csvGasto:'Gasto', csvMonto:'Monto', csvResumen:'Resumen', csvBruto:'Bruto', csvNeto:'Neto', csvTotalGastos:'Total gastos', csvRestante:'Restante',
+        exp:{pasaje:'Pasaje', comida:'Comida', renta:'Renta', internet:'Internet', streaming:'Streaming', recarga:'Recarga', barberia:'Barbería y gastos personales', ahorro:'Ahorro', ahorro2:'Ahorro 2', motor:'Mantenimiento de motor'},
+        modalTermsTitle:'Términos y Condiciones',
+        modalTermsContent:'<p>Esta calculadora se proporciona con fines informativos y educativos. Los resultados son estimaciones basadas en las tasas y fórmulas vigentes (TSS, DGII y Código de Trabajo), pero no sustituyen los cálculos oficiales del Ministerio de Trabajo, la TSS ni la DGII.</p><p>Los datos que ingresas se guardan únicamente en tu navegador (almacenamiento local) y no se envían a ningún servidor.</p><p>Verifica siempre los montos con las entidades oficiales antes de tomar decisiones laborales o financieras.</p>',
+        modalAboutTitle:'Acerca de',
+        modalAbout:(v)=>'<p><strong>Calculadora Laboral y Financiera RD</strong> — v' + v + '</p><p>Herramienta para estimar sueldo neto, presupuesto por período, vacaciones, regalía pascual y tiempo laborado en República Dominicana.</p><p>Desarrollado por <strong>FrancOS</strong> — Mecatrónico. Apasionado por la electrónica, la programación y el control numérico.</p><div class="github-profile">' + GH_SVG + '<a href="https://github.com/SimuladorCNC2D" target="_blank" rel="noopener">github.com/SimuladorCNC2D</a></div><p style="margin-top:10px;">💡 <a href="mailto:francos.dev@outlook.com">Contactar por correo</a> para reportar bugs o sugerencias.</p>',
+        changelogTitle:'Novedades de esta versión',
+        changelog:['Corregida la carga inicial: gastos y resultados aparecen al abrir la página.','Botón de modo día/noche idéntico al del simulador CNC (sol, luna y estrellas).','El cambio de idioma traduce toda la interfaz al instante y el selector ES/EN se desliza.','Todos los períodos visibles a la vez, con gráfico de pastel interactivo y barras comparativas.','AFP/ARS/ISR configurables y calculadora AFP/ARS en Herramientas.','Herramientas con cálculo automático y fecha de ingreso sincronizada con vacaciones.'],
+        modalIdeasTitle:'Ideas para seguir mejorando',
+        ideas:[['⏱️','Horas extras y recargos','Calcula horas extra (135 %/200 %), trabajo nocturno y feriados trabajados.'],['🧾','Liquidación completa','Preaviso, cesantía y vacaciones no disfrutadas en una sola calculadora.'],['🎯','Metas de ahorro','Fondo de emergencia y metas con barra de progreso mensual.'],['💳','Deudas y préstamos','Simulador de cuotas y estrategia bola de nieve / avalancha.'],['📈','Historial mensual','Gráfico anual de neto, gastos y ahorro comparando meses.'],['📊','Exportar a Excel (.xlsx)','Exportación e importación directa de tu hoja de presupuesto.'],['🔔','Recordatorios de pago','Archivo de calendario (.ics) con tus quincenas, bonos y feriados.'],['💱','Conversor RD$ ↔ USD','Con tasa del día para sueldos o metas en dólares.'],['📱','App instalable (PWA)','Funciona sin conexión y se instala en el teléfono.']]
+      },
+      en: {
+        title:'Labor & Financial Calculator', titleAccent:'DR',
+        subLabel:'Net salary, budget and labor tools.',
+        themeDay:'Day Mode', themeNight:'Night Mode',
+        tabSueldo:'Salary & Budget', tabHerramientas:'Labor Tools', tabFeriados:'Holidays & Links',
+        titleSueldo:'1. Salary Setup',
+        labelSalario:'Gross salary per period (RD$)', labelFrecuencia:'Frequency',
+        optMensual:'Monthly (1 period)', optQuincenal:'Fortnightly (2 periods)', optSemanal:'Weekly (4 periods)',
+        freqMensual:'Monthly', freqQuincenal:'Fortnightly', freqSemanal:'Weekly',
+        labelBonoDia:'Bonus day', labelBonoMonto:'Bonus amount (RD$)',
+        chkAfp:'Deduct AFP (pension)', chkArs:'Deduct ARS / SFS (health)', chkIsr:'Calculate income tax (ISR)',
+        lblDedTotal:'Statutory deduction applied',
+        noteDeduct:(o)=> 'Active deductions: ' + (o.parts.length ? o.parts.join(' + ') + ' = <strong>' + o.total + '%</strong> of gross salary (with TSS contribution caps)' : '<strong>none</strong> (salary is taken as entered)') + '. ' +
+          (o.isr ? 'ISR: DGII ' + o.year + ' scale, computed on projected annual income (gross − AFP − ARS + bonuses). ' : 'ISR is turned off. ') +
+          'The bonus is added to the net pay of the period containing the given day and carries no AFP/ARS deductions.',
+        btnReadonlyOff:'Read-only: OFF', btnReadonlyOn:'Read-only: ON',
+        btnSaveSnapshot:'Save to history', btnExportCSV:'Export CSV', btnPrint:'Print / PDF',
+        btnLoadExample:'Load example', btnClearAll:'Clear all',
+        titleGastos:'2. Period Expenses', btnResetGastos:'Reset expenses',
+        titleResultados:'3. Results (total across all periods)', titleBarras:'Breakdown by period', titleComparacion:'Period Comparison', titleHistorial:'Calculation History',
+        btnClearHistory:'Clear all',
+        resSalarioBruto:'Total gross salary', resAFP:(p)=>'Total AFP (' + p + '%)', resARS:(p)=>'Total ARS / SFS (' + p + '%)',
+        resISR:'Total estimated ISR', resBono:'Total bonus (periods with bonus)',
+        resNeto:'Total net salary', resTotalGastos:'Total expenses', resAhorro:'Savings',
+        resGastosReales:'Real expenses (excl. savings)', resRestante:'Total remaining',
+        resEquivMensual:'Monthly equivalent (gross)', resEquivAnual:'Annual equivalent (gross)', resISRAnual:'Estimated annual ISR',
+        chartGastos:'Expenses', chartAhorro:'Savings', chartRestante:'Remaining', chartDeficit:'Deficit', chartTotal:'Total', chartEmpty:'No data', chartOfTotal:'of total',
+        barNeto:'Net', barSobrante:'Left over', barFaltante:'Short',
+        colPeriodo:'Period', colBruto:'Gross', colAFP:'AFP/ARS', colISR:'ISR', colBono:'Bonus',
+        colNeto:'Net', colGastos:'Expenses', colRestante:'Remaining', rowTotal:'Total',
+        histEmpty:'No calculations saved yet. Press "Save to history" to add one.',
+        titleTiempo:'Time Worked',
+        labelFechaIngreso:'Start date', labelFechaSalida:'End date (optional)',
+        resLabelTiempoTotal:'Total time worked', resLabelDiasTotal:'Total days',
+        titleVacaciones:'Proportional Vacation',
+        labelVacIngreso:'Start date', labelVacSalida:'Cut-off date (optional)', labelVacSalario:'Monthly salary (RD$)',
+        resLabelAntig:'Length of service', resLabelDiasVac:'Vacation days', resLabelDiario:'Daily salary (÷ 23.83)', resLabelMontoVac:'Estimated amount',
+        notaVacaciones:'14 working days after 1 year of service and 18 days from 5 years (Art. 177). With under 1 year, the proportional scale applies (Art. 180): over 5 months = 6 days, over 6 = 7 … over 11 = 12. Daily salary = monthly ÷ 23.83.',
+        noVacYet:'Has not reached 5 months yet', daysWord:(n)=> n + (n===1?' day':' days'),
+        titleDobleSueldo:'Double Salary / Christmas Bonus',
+        labelDsSalario:'Average monthly salary (RD$)', labelDsMeses:'Months worked in the year',
+        resLabelRegalia:'Estimated Christmas bonus',
+        notaDobleSueldo:'The bonus equals one-twelfth (÷ 12) of the ordinary salaries earned in the year. It is paid no later than December 20 and is exempt from income tax.',
+        titleTss:'AFP / ARS Deductions Calculator', labelTssSalario:'Gross salary (RD$)',
+        tssRowBruto:'Gross salary', tssRowAfp:(p)=>'AFP (' + p + '%)', tssRowArs:(p)=>'ARS / SFS (' + p + '%)', tssRowIsr:'Estimated ISR',
+        tssRowTotal:'Total deductions', tssRowNeto:'Net salary', tssColMes:'Monthly', tssColAnio:'Annual', tssEmployer:'Employer contributions (informational)',
+        tssRowEmpAfp:'Employer AFP (7.10%)', tssRowEmpSfs:'Employer SFS (7.09%)',
+        tssNote:(o)=>'Employee rates: AFP ' + o.afp + '% and ARS/SFS ' + o.ars + '% (editable above). TSS 2026 monthly contribution caps: AFP ' + o.capAfp + ' and SFS ' + o.capSfs + ' (minimum contributory salary RD$23,223). Employer contributions are not deducted from your pay.',
+        titleCesantia:'Severance & Labor Benefits',
+        textoCesantia:'Need to calculate your severance or benefits?',
+        textoCesantiaDesc:'Visit the Dominican Ministry of Labor portal.',
+        btnCesantia:'Go to the Ministry of Labor →',
+        titleFeriados:'Holiday Calendar (Dominican Republic)',
+        textoFeriadosIntro:'Check the official holidays. Open the digital calendar or review the reference list below.',
+        textoCalendario:'Digital holiday calendar',
+        textoCalendarioDesc:'Google Calendar with the public holidays of the Dominican Republic.',
+        btnCalendario:'Open digital calendar →', btnMinTrabajo:'Ministry of Labor →',
+        thFecha:'Date', thFeriado:'Holiday', thDia:'Day', thNota:'Note',
+        noteMoved:(d)=>'Moved from ' + d, noteFixed:'Fixed date', noteWeekend:'Falls on a weekend (not moved)', nextHoliday:'Next holiday',
+        notaFeriados:'Reference list based on Law 139-97 and the calendars published by the Ministry of Labor. Always verify dates with the official source.',
+        statusText:'Systems stable', footerTerms:'Terms', footerAbout:'About', footerContact:'Contact', footerIdeas:'Ideas', footerReport:'Report bug',
+        confirmFreq:'Changing the frequency will reset expenses to the defaults of the new frequency. Continue?',
+        confirmClearAll:'Delete all data and reset to zero?',
+        confirmClearHistory:'Clear all history?',
+        confirmResetExpenses:'Reset ALL expenses from ALL periods to defaults?',
+        exampleLoaded:'Example loaded (based on your Excel sheet). Edit the values as you like.',
+        snapshotSaved:'Calculation saved to history.',
+        invalidDate:'Invalid date',
+        placeholderName:'Expense name', addExpense:'Add expense', removeExpense:'Remove expense',
+        periodMes:'Month', periodQuincena:(n)=>'Fortnight ' + n + (n===1?' (days 1-15)':' (days 16-31)'), periodSemana:(n)=>'Week ' + n,
+        yearS:(n)=> n + (n===1?' year':' years'), monthS:(n)=> n + (n===1?' month':' months'), dayS:(n)=> n + (n===1?' day':' days'),
+        csvPeriodo:'Period', csvGasto:'Expense', csvMonto:'Amount', csvResumen:'Summary', csvBruto:'Gross', csvNeto:'Net', csvTotalGastos:'Total expenses', csvRestante:'Remaining',
+        exp:{pasaje:'Transport', comida:'Food', renta:'Rent', internet:'Internet', streaming:'Streaming', recarga:'Phone top-up', barberia:'Barber & personal expenses', ahorro:'Savings', ahorro2:'Savings 2', motor:'Motorcycle maintenance'},
+        modalTermsTitle:'Terms and Conditions',
+        modalTermsContent:'<p>This calculator is provided for informational and educational purposes. Results are estimates based on current rates and formulas (TSS, DGII and the Labor Code), but they do not replace official calculations from the Ministry of Labor, TSS or DGII.</p><p>The data you enter is stored only in your browser (local storage) and is never sent to any server.</p><p>Always verify amounts with official entities before making labor or financial decisions.</p>',
+        modalAboutTitle:'About',
+        modalAbout:(v)=>'<p><strong>Labor &amp; Financial Calculator DR</strong> — v' + v + '</p><p>Tool to estimate net salary, per-period budget, vacation, Christmas bonus and time worked in the Dominican Republic.</p><p>Developed by <strong>FrancOS</strong> — Mechatronics. Passionate about electronics, programming and numerical control.</p><div class="github-profile">' + GH_SVG + '<a href="https://github.com/SimuladorCNC2D" target="_blank" rel="noopener">github.com/SimuladorCNC2D</a></div><p style="margin-top:10px;">💡 <a href="mailto:francos.dev@outlook.com">Contact by email</a> to report bugs or suggestions.</p>',
+        changelogTitle:'What\'s new in this version',
+        changelog:['Fixed initial load: expenses and results show up as soon as the page opens.','Day/night button identical to the CNC simulator (sun, moon and stars).','Switching language translates the whole interface instantly and the ES/EN selector slides.','All periods visible at once, with an interactive pie chart and comparison bars.','Configurable AFP/ARS/ISR and an AFP/ARS calculator in Tools.','Tools calculate automatically and the start date syncs with vacation.'],
+        modalIdeasTitle:'Ideas to keep improving',
+        ideas:[['⏱️','Overtime and surcharges','Compute overtime (135% / 200%), night work and worked holidays.'],['🧾','Full severance','Notice, severance and unused vacation in a single calculator.'],['🎯','Savings goals','Emergency fund and goals with a monthly progress bar.'],['💳','Debts and loans','Installment simulator and snowball / avalanche strategy.'],['📈','Monthly history','Yearly chart of net, expenses and savings comparing months.'],['📊','Export to Excel (.xlsx)','Direct export and import of your budget sheet.'],['🔔','Payment reminders','Calendar file (.ics) with your paydays, bonuses and holidays.'],['💱','RD$ ↔ USD converter','With the daily rate for salaries or goals in dollars.'],['📱','Installable app (PWA)','Works offline and installs on your phone.']]
+      }
+    };
+
+    // ===== FERIADOS (fuente: Ministerio de Trabajo / Ley 139-97) =====
+    // [fecha efectiva, clave, fecha original si fue trasladado]
+    const HOL = {
+      2026: [['2026-01-01','ny'],['2026-01-05','reyes','2026-01-06'],['2026-01-21','alta'],['2026-01-26','duarte'],['2026-02-27','indep'],['2026-04-03','viernes'],['2026-05-04','trabajo','2026-05-01'],['2026-06-04','corpus'],['2026-08-16','resta'],['2026-09-24','mercedes'],['2026-11-09','const','2026-11-06'],['2026-12-25','navidad']],
+      2027: [['2027-01-01','ny'],['2027-01-04','reyes','2027-01-06'],['2027-01-21','alta'],['2027-01-25','duarte','2027-01-26'],['2027-02-27','indep'],['2027-03-26','viernes'],['2027-05-01','trabajo'],['2027-05-27','corpus'],['2027-08-16','resta'],['2027-09-24','mercedes'],['2027-11-06','const'],['2027-12-25','navidad']]
+    };
+    const HOL_NAMES = {
+      es:{ny:'Año Nuevo',reyes:'Día de los Santos Reyes',alta:'Nuestra Señora de la Altagracia',duarte:'Natalicio de Juan Pablo Duarte',indep:'Día de la Independencia Nacional',viernes:'Viernes Santo',trabajo:'Día del Trabajo',corpus:'Corpus Christi',resta:'Día de la Restauración',mercedes:'Nuestra Señora de las Mercedes',const:'Día de la Constitución',navidad:'Navidad'},
+      en:{ny:"New Year's Day",reyes:'Epiphany (Three Kings Day)',alta:'Our Lady of Altagracia',duarte:"Juan Pablo Duarte's Birthday",indep:'Independence Day',viernes:'Good Friday',trabajo:'Labour Day',corpus:'Corpus Christi',resta:'Restoration Day',mercedes:'Our Lady of Mercedes',const:'Constitution Day',navidad:'Christmas Day'}
+    };
+
+    // ===== CONSTANTES LEGALES RD (2026) =====
+    const CAP = { afp:464460, sfs:232230 };           // topes mensuales TSS (feb 2026)
+    const WORKDAYS = 23.83;                            // divisor salario diario
+    const ISR_SCALES = {
+      2026: [[416220,0,.15],[624329,31216,.20],[867123,79776,.25]],
+      2027: [[480000,0,.15],[685000,30750,.20],[910000,75750,.25],[4800000,1048250,.27]]
+    };
+    const PPY = { mensual:12, quincenal:24, semanal:52 };
+    const NPER = { mensual:1, quincenal:2, semanal:4 };
+
+    function calcISR(annual, year) {
+      const sc = ISR_SCALES[year] || ISR_SCALES[2026];
+      let r = 0;
+      for (const [from, base, rate] of sc) if (annual > from) r = base + (annual - from) * rate;
+      return r;
+    }
+
+    // ============ ESTADO ============
+    const DEFAULT_STATE = () => ({
+      lang:'es', theme:'dark',
+      salarioBruto:0, frecuencia:'quincenal', bonoDia:15, bonoMonto:0,
+      useAfp:true, afpPct:2.87, useArs:true, arsPct:3.04, useIsr:true, isrYear:2026,
+      periods:[], readonly:false, history:[],
+      tools:{ fechaIngreso:'', fechaSalida:'', vacFechaIngreso:'', vacFechaSalida:'', vacSalario:'', dsSalario:'', dsMeses:'12', tssSalario:'', tssFreq:'quincenal' },
+      touched:{}
+    });
+    let state = DEFAULT_STATE();
+    let currentLang = 'es';
+    let holYear = new Date().getFullYear() >= 2027 ? 2027 : 2026;
+    let openModal = null;
+    const t = (k, ...a) => { const v = (T[currentLang][k] !== undefined ? T[currentLang][k] : T.es[k]); return typeof v === 'function' ? v(...a) : v; };
+    const locale = () => currentLang === 'es' ? 'es-DO' : 'en-US';
+
+    function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {} }
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const p = JSON.parse(raw);
+        const base = DEFAULT_STATE();
+        state = Object.assign(base, p);
+        state.tools = Object.assign(base.tools, p.tools || {});
+        state.touched = p.touched || {};
+        if (!Array.isArray(state.history)) state.history = [];
+        const n = NPER[state.frecuencia] || 2;
+        const ok = Array.isArray(state.periods) && state.periods.length === n && state.periods.every(x => x && Array.isArray(x.expenses) && x.expenses.length > 0);
+        if (!ok) state.periods = defaultPeriods(state.frecuencia);
+        return true;
+      } catch(e) { state = DEFAULT_STATE(); }
+      return false;
+    }
+
+    // ============ UTILIDADES ============
+    function uid() { return 'e' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4); }
+    function fmt(n) { return 'RD$' + (Number(n) || 0).toLocaleString('es-DO', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+    function fmtNum(n) { return (Number(n) || 0).toLocaleString('es-DO', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+    function neg(n) { return (Number(n) > 0.004 ? '-' : '') + fmt(n); }
+    function negNum(n) { return (Number(n) > 0.004 ? '-' : '') + fmtNum(n); }
+    function pct(n) { return (Math.round((Number(n)||0) * 100) / 100).toString(); }
+    function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    const DEFAULT_KEYS = {
+      mensual:['pasaje','comida','renta','internet','streaming','recarga','barberia','ahorro'],
+      quincenal:['pasaje','comida','renta','recarga','barberia','ahorro'],
+      semanal:['pasaje','comida','renta','recarga','ahorro']
+    };
+    // un gasto con name:null muestra el nombre por defecto en el idioma activo
+    function mkExp(k, value, name) { return { id: uid(), k: k || null, name: (name === undefined ? null : name), value: value || 0 }; }
+    function expName(e) { return e.name !== null && e.name !== undefined ? e.name : (e.k ? (T[currentLang].exp[e.k] || e.k) : ''); }
+    function isSaving(e) { return (e.k && /^ahorro/.test(e.k)) || /ahorro|saving/i.test(expName(e)); }
+    function defaultPeriods(freq) {
+      const keys = DEFAULT_KEYS[freq] || DEFAULT_KEYS.quincenal;
+      return Array.from({length: NPER[freq] || 2}, () => ({ expenses: keys.map(k => mkExp(k, 0)) }));
+    }
+    function periodName(i) {
+      if (state.frecuencia === 'mensual') return t('periodMes');
+      if (state.frecuencia === 'quincenal') return t('periodQuincena', i + 1);
+      return t('periodSemana', i + 1);
+    }
+    const freqLabel = f => t(f === 'mensual' ? 'freqMensual' : f === 'quincenal' ? 'freqQuincenal' : 'freqSemanal');
+
+    // ============ CÁLCULOS ============
+    function periodContainsDay(idx, day) {
+      if (state.frecuencia === 'mensual') return true;
+      if (state.frecuencia === 'quincenal') return idx === 0 ? day <= 15 : day >= 16;
+      const ranges = [[1,7],[8,14],[15,21],[22,31]];
+      return day >= ranges[idx][0] && day <= ranges[idx][1];
+    }
+
+    // Descuentos anuales/periódicos para un bruto dado (reutilizado por la calculadora AFP/ARS)
+    function deductionsFor(salario, freq, o) {
+      const ppx = PPY[freq];
+      const monthly = salario * ppx / 12;
+      const afpM = o.afp ? Math.min(monthly, CAP.afp) * o.afpPct / 100 : 0;
+      const arsM = o.ars ? Math.min(monthly, CAP.sfs) * o.arsPct / 100 : 0;
+      const annualBase = salario * ppx - (afpM + arsM) * 12 + (o.bonoAnual || 0);
+      const isrA = o.isr ? calcISR(Math.max(0, annualBase), o.year) : 0;
+      return { ppx, monthly, afpM, arsM, isrA };
+    }
+
+    function calcPeriod(idx) {
+      const empty = { salario:0, afp:0, ars:0, isrPeriodo:0, bono:0, neto:0, totalGastos:0, ahorro:0, gastosReales:0, restante:0, annualISR:0, ppx:1 };
+      const period = state.periods[idx];
+      if (!period) return empty;
+      const salario = Number(state.salarioBruto) || 0;
+      const bonoM = Number(state.bonoMonto) || 0;
+      const d = deductionsFor(salario, state.frecuencia, { afp:state.useAfp, afpPct:+state.afpPct||0, ars:state.useArs, arsPct:+state.arsPct||0, isr:state.useIsr, year:+state.isrYear, bonoAnual:bonoM * 12 });
+      const afp = d.afpM * 12 / d.ppx, ars = d.arsM * 12 / d.ppx, isrPeriodo = d.isrA / d.ppx;
+      const bono = periodContainsDay(idx, Number(state.bonoDia) || 1) ? bonoM : 0;
+      const neto = salario - afp - ars - isrPeriodo + bono;
+      let totalGastos = 0, ahorro = 0;
+      (period.expenses || []).forEach(e => { const v = Number(e.value) || 0; totalGastos += v; if (isSaving(e)) ahorro += v; });
+      return { salario, afp, ars, isrPeriodo, bono, neto, totalGastos, ahorro, gastosReales:totalGastos - ahorro, restante:neto - totalGastos, annualISR:d.isrA, ppx:d.ppx };
+    }
+    function calcAll() {
+      const acc = { salario:0, afp:0, ars:0, isrPeriodo:0, bono:0, neto:0, totalGastos:0, ahorro:0, gastosReales:0, restante:0, annualISR:0, ppx:PPY[state.frecuencia] || 24 };
+      state.periods.forEach((_, i) => {
+        const r = calcPeriod(i);
+        ['salario','afp','ars','isrPeriodo','bono','neto','totalGastos','ahorro','gastosReales','restante'].forEach(k => acc[k] += r[k]);
+        acc.annualISR = r.annualISR;
+      });
+      return acc;
+    }
+
+    // ============ ACTUALIZACIÓN ============
+    function updateAll() {
+      saveState();
+      const steps = [updateDeductNote, updateResults, renderChart, renderBars, renderComparison, renderHistory];
+      steps.forEach(fn => { try { fn(); } catch(e) { console.error(fn.name, e); } });
+    }
+
+    function updateDeductNote() {
+      const parts = [];
+      let total = 0;
+      if (state.useAfp) { parts.push('AFP ' + pct(state.afpPct) + '%'); total += +state.afpPct || 0; }
+      if (state.useArs) { parts.push('ARS/SFS ' + pct(state.arsPct) + '%'); total += +state.arsPct || 0; }
+      $('dedTotalPct').textContent = pct(total) + '%';
+      $('deductNote').innerHTML = t('noteDeduct', { parts, total:pct(total), isr:state.useIsr, year:state.isrYear });
+    }
+
+    function row(label, value, cls, extra) {
+      return '<div class="result-row ' + (extra || '') + '"><span class="label">' + label + '</span><span class="value ' + (cls || '') + '">' + value + '</span></div>';
+    }
+    function updateResults() {
+      const r = calcAll();
+      const box = $('resultBox');
+      const salario = Number(state.salarioBruto) || 0;
+      box.innerHTML =
+        row(t('resSalarioBruto'), fmt(r.salario)) +
+        (state.useAfp ? row(t('resAFP', pct(state.afpPct)), neg(r.afp), 'negative') : '') +
+        (state.useArs ? row(t('resARS', pct(state.arsPct)), neg(r.ars), 'negative') : '') +
+        (state.useIsr ? row(t('resISR'), neg(r.isrPeriodo), 'negative') : '') +
+        row(t('resBono'), '+' + fmt(r.bono), 'positive') +
+        row(t('resNeto'), fmt(r.neto), 'positive', 'total-row') +
+        row(t('resTotalGastos'), '-' + fmt(r.totalGastos), 'negative') +
+        row(t('resAhorro'), fmt(r.ahorro), 'positive') +
+        row(t('resGastosReales'), '-' + fmt(r.gastosReales), 'negative') +
+        row(t('resRestante'), fmt(r.restante), r.restante >= 0 ? 'positive' : 'negative', 'total-row') +
+        row(t('resEquivMensual'), fmt(salario * r.ppx / 12), '', 'sep') +
+        row(t('resEquivAnual'), fmt(salario * r.ppx)) +
+        (state.useIsr ? row(t('resISRAnual'), neg(r.annualISR), 'negative') : '');
+    }
+
+    // ============ GRÁFICO DE PASTEL (SVG interactivo) ============
+    let chartData = [];
+    function renderChart() {
+      const r = calcAll();
+      chartData = [
+        { label:t('chartGastos'),   value:Math.max(0, r.gastosReales), color:'var(--color-gasto)' },
+        { label:t('chartAhorro'),   value:Math.max(0, r.ahorro),       color:'var(--color-ahorro)' },
+        { label:t('chartRestante'), value:Math.max(0, r.restante),     color:'var(--color-restante)' }
+      ];
+      if (r.restante < 0) chartData.push({ label:t('chartDeficit'), value:Math.abs(r.restante), color:'var(--color-deficit)' });
+      chartData = chartData.filter(d => d.value > 0);
+      const total = chartData.reduce((s, d) => s + d.value, 0);
+      const holder = $('chartHolder'), legend = $('chartLegend');
+      if (total <= 0) {
+        holder.innerHTML = '<svg class="donut" viewBox="0 0 200 200"><circle cx="100" cy="100" r="70" fill="none" stroke="var(--border-color)" stroke-width="28"/><text x="100" y="104" class="d-sm">' + t('chartEmpty') + '</text></svg>';
+        legend.innerHTML = '';
+        return;
+      }
+      const R = 70, C = 2 * Math.PI * R;
+      let off = 0, slices = '';
+      chartData.forEach((d, i) => {
+        const len = d.value / total * C;
+        slices += '<circle class="slice" data-i="' + i + '" cx="100" cy="100" r="' + R + '" stroke="' + d.color + '" stroke-dasharray="' + len + ' ' + (C - len) + '" stroke-dashoffset="' + (-off) + '" transform="rotate(-90 100 100)"></circle>';
+        off += len;
+      });
+      holder.innerHTML = '<svg class="donut" id="donutSvg" viewBox="0 0 200 200" role="img">' + slices +
+        '<text id="dBig" x="100" y="97" class="d-big">' + fmtNum(total) + '</text><text id="dSm" x="100" y="113" class="d-sm">' + t('chartTotal') + '</text></svg>';
+      legend.innerHTML = chartData.map((d, i) =>
+        '<div class="legend-item" data-i="' + i + '"><span class="legend-dot" style="background:' + d.color + '"></span>' + d.label + ': ' + fmt(d.value) + '</div>').join('');
+      chartTotal = total;
+    }
+    let chartTotal = 0;
+    function setHover(i, evt) {
+      const svg = $('donutSvg'), legend = $('chartLegend'), tip = $('chartTooltip');
+      if (!svg) return;
+      const has = i !== null && chartData[i];
+      svg.classList.toggle('has-hover', !!has);
+      legend.classList.toggle('has-hover', !!has);
+      svg.querySelectorAll('.slice').forEach(s => s.classList.toggle('hov', has && +s.dataset.i === i));
+      legend.querySelectorAll('.legend-item').forEach(l => l.classList.toggle('hov', has && +l.dataset.i === i));
+      const big = $('dBig'), sm = $('dSm');
+      if (has) {
+        const d = chartData[i];
+        big.textContent = d.label; sm.textContent = fmtNum(d.value) + ' · ' + (d.value / chartTotal * 100).toFixed(1) + '%';
+        if (evt && evt.target.classList && evt.target.classList.contains('slice')) {
+          tip.textContent = d.label + ': ' + fmt(d.value) + ' (' + (d.value / chartTotal * 100).toFixed(1) + '% ' + t('chartOfTotal') + ')';
+          tip.style.left = (evt.clientX + 14) + 'px'; tip.style.top = (evt.clientY - 34) + 'px';
+          tip.classList.add('visible');
+        } else tip.classList.remove('visible');
+      } else {
+        big.textContent = fmtNum(chartTotal); sm.textContent = t('chartTotal');
+        tip.classList.remove('visible');
+      }
+    }
+    function initChartHover() {
+      const box = $('chartBox');
+      const idxOf = e => { const el = e.target.closest('[data-i]'); return el ? +el.dataset.i : null; };
+      box.addEventListener('mousemove', e => setHover(idxOf(e), e));
+      box.addEventListener('mouseover', e => setHover(idxOf(e), e));
+      box.addEventListener('mouseleave', () => setHover(null));
+      box.addEventListener('touchstart', e => { const el = e.target.closest('[data-i]'); setHover(el ? +el.dataset.i : null, e.touches[0] && { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY }); }, {passive:true});
+    }
+
+    // ============ BARRAS POR PERÍODO ============
+    function renderBars() {
+      const rows = state.periods.map((_, i) => ({ name:periodName(i), r:calcPeriod(i) }));
+      const maxV = Math.max(1, ...rows.map(x => Math.max(x.r.neto, x.r.totalGastos)));
+      $('barsBox').innerHTML = rows.map(({ name, r }) => {
+        const w = v => (Math.max(0, v) / maxV * 100).toFixed(2) + '%';
+        const rest = r.restante >= 0
+          ? '<div class="bar-seg" style="width:' + w(r.restante) + ';background:var(--color-restante)" title="' + t('barSobrante') + ': ' + fmt(r.restante) + '"></div>'
+          : '<div class="bar-seg" style="width:' + w(-r.restante) + ';background:var(--color-deficit)" title="' + t('barFaltante') + ': ' + fmt(-r.restante) + '"></div>';
+        return '<div class="bar-row"><div class="bar-name">' + esc(name) + '</div><div class="bar-track">' +
+          '<div class="bar-seg" style="width:' + w(r.gastosReales) + ';background:var(--color-gasto)" title="' + t('chartGastos') + ': ' + fmt(r.gastosReales) + '"></div>' +
+          '<div class="bar-seg" style="width:' + w(r.ahorro) + ';background:var(--color-ahorro)" title="' + t('chartAhorro') + ': ' + fmt(r.ahorro) + '"></div>' + rest +
+          '</div><div class="bar-meta">' + t('barNeto') + ' ' + fmt(r.neto) + ' · ' + t('chartGastos') + ' ' + fmt(r.gastosReales) + ' · ' + t('chartAhorro') + ' ' + fmt(r.ahorro) + ' · ' + (r.restante >= 0 ? t('barSobrante') : t('barFaltante')) + ' ' + fmt(Math.abs(r.restante)) + '</div></div>';
+      }).join('');
+    }
+
+    // ============ TABLA COMPARATIVA ============
+    function renderComparison() {
+      const cell = v => '<td class="num">' + fmtNum(v) + '</td>';
+      let html = '<thead><tr><th>' + t('colPeriodo') + '</th><th>' + t('colBruto') + '</th><th>' + t('colAFP') + '</th><th>' + t('colISR') + '</th><th>' + t('colBono') + '</th><th>' + t('colNeto') + '</th><th>' + t('colGastos') + '</th><th>' + t('colRestante') + '</th></tr></thead><tbody>';
+      const line = (name, r, bold) => {
+        const b = x => bold ? '<strong>' + x + '</strong>' : x;
+        return '<tr>' + '<td>' + b(esc(name)) + '</td>' + '<td class="num">' + b(fmtNum(r.salario)) + '</td>' + '<td class="num">' + b(negNum(r.afp + r.ars)) + '</td>' +
+          '<td class="num">' + b(negNum(r.isrPeriodo)) + '</td>' + '<td class="num">' + b((r.bono > 0 ? '+' : '') + fmtNum(r.bono)) + '</td>' + '<td class="num"><strong>' + fmtNum(r.neto) + '</strong></td>' +
+          '<td class="num">' + b(negNum(r.totalGastos)) + '</td>' + '<td class="num" style="color:' + (r.restante >= 0 ? 'var(--accent)' : 'var(--danger)') + '"><strong>' + fmtNum(r.restante) + '</strong></td></tr>';
+      };
+      state.periods.forEach((_, i) => { html += line(periodName(i), calcPeriod(i), false); });
+      if (state.periods.length > 1) html += line(t('rowTotal'), calcAll(), true);
+      $('comparisonTable').innerHTML = html + '</tbody>';
+    }
+
+    // ============ GASTOS ============
+    function renderExpenses() {
+      const container = $('expenseSections');
+      container.innerHTML = '';
+      state.periods.forEach((period, idx) => {
+        const section = document.createElement('div');
+        section.className = 'period-section';
+        const r = calcPeriod(idx);
+        section.innerHTML = '<h3 class="period-title"><span>' + esc(periodName(idx)) + '</span><small data-sum="' + idx + '">' + fmt(r.totalGastos) + '</small></h3>';
+        const grid = document.createElement('div');
+        grid.className = 'expense-grid';
+        period.expenses.forEach(exp => {
+          const card = document.createElement('div');
+          card.className = 'expense-card';
+          card.dataset.id = exp.id; card.dataset.period = idx;
+          if (!state.readonly) {
+            const del = document.createElement('button');
+            del.className = 'expense-delete'; del.type = 'button'; del.dataset.id = exp.id; del.textContent = '×'; del.title = t('removeExpense');
+            card.appendChild(del);
+          }
+          const nameInput = document.createElement('input');
+          nameInput.type = 'text'; nameInput.className = 'expense-name'; nameInput.value = expName(exp); nameInput.dataset.id = exp.id; nameInput.placeholder = t('placeholderName');
+          nameInput.disabled = state.readonly;
+          card.appendChild(nameInput);
+          const valInput = document.createElement('input');
+          valInput.type = 'number'; valInput.className = 'expense-value'; valInput.value = exp.value; valInput.min = 0; valInput.step = '0.01'; valInput.dataset.id = exp.id;
+          valInput.disabled = state.readonly;
+          card.appendChild(valInput);
+          grid.appendChild(card);
+        });
+        if (!state.readonly) {
+          const addCard = document.createElement('div');
+          addCard.className = 'expense-card'; addCard.dataset.period = idx;
+          addCard.style.cssText = 'padding:0;border:none;background:transparent;box-shadow:none';
+          const addBtn = document.createElement('button');
+          addBtn.className = 'expense-add-slot'; addBtn.type = 'button'; addBtn.textContent = '+'; addBtn.title = t('addExpense');
+          addCard.appendChild(addBtn);
+          grid.appendChild(addCard);
+        }
+        section.appendChild(grid);
+        container.appendChild(section);
+      });
+    }
+    function refreshPeriodSums() {
+      document.querySelectorAll('[data-sum]').forEach(el => { el.textContent = fmt(calcPeriod(+el.dataset.sum).totalGastos); });
+    }
+    function addExpense(periodIdx) {
+      if (state.readonly) return;
+      const exp = mkExp(null, 0, '');
+      state.periods[periodIdx].expenses.push(exp);
+      renderExpenses(); updateAll();
+      setTimeout(() => { const i = document.querySelector('.expense-card[data-id="' + exp.id + '"] .expense-name'); if (i) i.focus(); }, 30);
+    }
+    function resetExpenses() {
+      if (!confirm(t('confirmResetExpenses'))) return;
+      state.periods = defaultPeriods(state.frecuencia);
+      renderExpenses(); updateAll();
+    }
+
+    // ============ HISTORIAL ============
+    function saveSnapshot() {
+      const r = calcAll();
+      state.history.unshift({ date:new Date().toISOString(), frecuencia:state.frecuencia, salarioBruto:state.salarioBruto, neto:r.neto, gastos:r.totalGastos, restante:r.restante });
+      if (state.history.length > 50) state.history.pop();
+      saveState(); renderHistory(); alert(t('snapshotSaved'));
+    }
+    function renderHistory() {
+      const cont = $('historyList');
+      if (!state.history.length) { cont.innerHTML = '<div class="empty-state">' + t('histEmpty') + '</div>'; return; }
+      cont.innerHTML = state.history.map(h => {
+        const date = new Date(h.date).toLocaleString(locale(), { dateStyle:'short', timeStyle:'short' });
+        return '<div class="history-item"><div class="hist-meta"><strong>' + date + '</strong> · ' + freqLabel(h.frecuencia) + '</div><div class="hist-values">' +
+          '<span style="color:var(--accent)">' + fmt(h.neto) + '</span><span style="color:var(--danger)">-' + fmt(h.gastos) + '</span>' +
+          '<span style="color:' + (h.restante >= 0 ? 'var(--accent)' : 'var(--danger)') + '">= ' + fmt(h.restante) + '</span></div></div>';
+      }).join('');
+    }
+    function clearHistory() { if (!confirm(t('confirmClearHistory'))) return; state.history = []; saveState(); renderHistory(); }
+
+    // ============ ACCIONES ============
+    function onFrecuenciaChange(e) {
+      const freq = e.target.value;
+      if (freq === state.frecuencia) return;
+      const hasData = state.periods.some(p => p.expenses.some(x => Number(x.value) > 0));
+      if (hasData && !confirm(t('confirmFreq'))) { e.target.value = state.frecuencia; return; }
+      state.frecuencia = freq;
+      state.periods = defaultPeriods(freq);
+      syncToolsFromMain();
+      renderExpenses(); updateAll(); recalcTools();
+    }
+    function toggleReadonly() {
+      state.readonly = !state.readonly;
+      updateReadonlyButton();
+      ['salarioBruto','frecuencia','bonoDia','bonoMonto','useAfp','afpPct','useArs','arsPct','useIsr','isrYear'].forEach(id => { $(id).disabled = state.readonly; });
+      renderExpenses(); saveState();
+    }
+    function updateReadonlyButton() {
+      $('btnReadonly').innerHTML = (state.readonly ? '🔓 ' : '🔒 ') + '<span>' + t(state.readonly ? 'btnReadonlyOn' : 'btnReadonlyOff') + '</span>';
+    }
+    function pushStateToInputs() {
+      $('salarioBruto').value = state.salarioBruto || '';
+      $('frecuencia').value = state.frecuencia;
+      $('bonoDia').value = state.bonoDia; $('bonoMonto').value = state.bonoMonto || '';
+      $('useAfp').checked = state.useAfp; $('afpPct').value = state.afpPct;
+      $('useArs').checked = state.useArs; $('arsPct').value = state.arsPct;
+      $('useIsr').checked = state.useIsr; $('isrYear').value = state.isrYear;
+      Object.keys(state.tools).forEach(k => { const el = $(k); if (el) el.value = state.tools[k]; });
+      ['salarioBruto','frecuencia','bonoDia','bonoMonto','useAfp','afpPct','useArs','arsPct','useIsr','isrYear'].forEach(id => { $(id).disabled = state.readonly; });
+    }
+    function loadExample() {
+      state.salarioBruto = 15400; state.frecuencia = 'quincenal'; state.bonoDia = 15; state.bonoMonto = 1500;
+      state.useAfp = state.useArs = state.useIsr = true;
+      const m = (k, v, n) => mkExp(k, v, n);
+      state.periods = [
+        { expenses:[m('pasaje',1800), m('motor',350), m(null,500,'Mami'), m('comida',3500), m('barberia',1050), m('renta',2000), m('ahorro',3000), m('ahorro2',2100), m('streaming',1193.36), m('recarga',150)] },
+        { expenses:[m('pasaje',1800), m('motor',350), m(null,500,'Mami'), m('comida',3500), m('barberia',1050), m('renta',2000), m('ahorro',3000), m('ahorro2',900), m('internet',1500), m('recarga',150)] }
+      ];
+      state.touched = {};
+      syncToolsFromMain(true);
+      pushStateToInputs(); renderExpenses(); updateAll(); recalcTools();
+      alert(t('exampleLoaded'));
+    }
+    function clearAll() {
+      if (!confirm(t('confirmClearAll'))) return;
+      const keep = { lang:state.lang, theme:state.theme };
+      state = Object.assign(DEFAULT_STATE(), keep);
+      state.periods = defaultPeriods(state.frecuencia);
+      pushStateToInputs(); renderExpenses(); updateAll(); recalcTools();
+    }
+    function exportCSV() {
+      const rows = [[t('csvPeriodo'), t('csvGasto'), t('csvMonto')]];
+      state.periods.forEach((p, i) => p.expenses.forEach(e => rows.push([periodName(i), expName(e), (Number(e.value) || 0).toFixed(2)])));
+      rows.push([], [t('csvResumen')], [t('csvPeriodo'), t('csvBruto'), t('colAFP'), t('colISR'), t('colBono'), t('csvNeto'), t('csvTotalGastos'), t('csvRestante')]);
+      state.periods.forEach((_, i) => { const r = calcPeriod(i); rows.push([periodName(i), r.salario, r.afp + r.ars, r.isrPeriodo, r.bono, r.neto, r.totalGastos, r.restante].map((v, j) => j === 0 ? v : v.toFixed(2))); });
+      const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+      const url = URL.createObjectURL(new Blob(["﻿" + csv], { type:'text/csv;charset=utf-8' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = 'calculadora_rd_' + state.frecuencia + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+
+    // ============ HERRAMIENTAS LABORALES ============
+    const pd = s => { if (!s) return null; const [y, m, d] = s.split('-').map(Number); return (y && m && d) ? { y, m, d } : null; };
+    const dnum = o => Date.UTC(o.y, o.m - 1, o.d) / 86400000;
+    const dim = (y, m) => new Date(y, m, 0).getDate();
+    function addMonths(a, n) { const tt = a.y * 12 + (a.m - 1) + n; const y = Math.floor(tt / 12), m = tt % 12 + 1; return { y, m, d:Math.min(a.d, dim(y, m)) }; }
+    function ymd(a, b) {
+      let mo = (b.y - a.y) * 12 + (b.m - a.m); if (b.d < a.d) mo--; if (mo < 0) mo = 0;
+      return { y:Math.floor(mo / 12), m:mo % 12, d:dnum(b) - dnum(addMonths(a, mo)), months:mo };
+    }
+    function todayObj() { const n = new Date(); return { y:n.getFullYear(), m:n.getMonth() + 1, d:n.getDate() }; }
+    function durText(x) {
+      const parts = [];
+      if (x.y > 0) parts.push(t('yearS', x.y));
+      if (x.m > 0) parts.push(t('monthS', x.m));
+      if (x.d > 0) parts.push(t('dayS', x.d));
+      return parts.length ? parts.join(', ') : t('dayS', 0);
+    }
+    const setTxt = (id, v) => { $(id).textContent = v; };
+
+    function calcularTiempo() {
+      const a = pd($('fechaIngreso').value), b = pd($('fechaSalida').value) || todayObj();
+      if (!a) { setTxt('resTiempoTotal', '—'); setTxt('resDiasTotal', '—'); return; }
+      if (dnum(b) < dnum(a)) { setTxt('resTiempoTotal', t('invalidDate')); setTxt('resDiasTotal', '—'); return; }
+      setTxt('resTiempoTotal', durText(ymd(a, b)));
+      setTxt('resDiasTotal', t('daysWord', Math.round(dnum(b) - dnum(a))).replace(/^(\d+)/, m => (+m).toLocaleString(locale())));
+    }
+    function calcularVacaciones() {
+      const a = pd($('vacFechaIngreso').value), b = pd($('vacFechaSalida').value) || todayObj();
+      const sal = parseFloat($('vacSalario').value) || 0;
+      ['resAntigVac','resDiasVac','resDiarioVac','resMontoVac'].forEach(id => setTxt(id, '—'));
+      if (!a) return;
+      if (dnum(b) < dnum(a)) { setTxt('resAntigVac', t('invalidDate')); return; }
+      const x = ymd(a, b);
+      setTxt('resAntigVac', durText(x));
+      let dias = 0;
+      if (x.y >= 1) dias = x.y >= 5 ? 18 : 14;
+      else { const k = x.d > 0 ? x.m : x.m - 1; if (k >= 5) dias = Math.min(k, 11) + 1; }
+      setTxt('resDiasVac', dias > 0 ? t('daysWord', dias) : t('noVacYet'));
+      if (sal > 0) { const diario = sal / WORKDAYS; setTxt('resDiarioVac', fmt(diario)); setTxt('resMontoVac', fmt(diario * dias)); }
+    }
+    function calcularDobleSueldo() {
+      const sal = parseFloat($('dsSalario').value) || 0, meses = parseFloat($('dsMeses').value) || 0;
+      setTxt('resRegalia', sal > 0 ? fmt(sal * meses / 12) : '—');
+    }
+    function calcularTss() {
+      const sal = parseFloat($('tssSalario').value) || 0, freq = $('tssFreq').value;
+      const table = $('tssTable'), ppx = PPY[freq];
+      const ap = +state.afpPct || 0, rp = +state.arsPct || 0;
+      const d = deductionsFor(sal, freq, { afp:true, afpPct:ap, ars:true, arsPct:rp, isr:state.useIsr, year:+state.isrYear, bonoAnual:0 });
+      const A = { bruto:sal * ppx, afp:d.afpM * 12, ars:d.arsM * 12, isr:d.isrA };
+      A.tot = A.afp + A.ars + A.isr; A.neto = A.bruto - A.tot;
+      const empAfp = Math.min(d.monthly, CAP.afp) * 0.0710, empSfs = Math.min(d.monthly, CAP.sfs) * 0.0709;
+      const rw = (label, k, cls) => '<tr><td>' + (cls === 'b' ? '<strong>' + label + '</strong>' : label) + '</td><td class="num">' + fmtNum(A[k] / ppx) + '</td><td class="num">' + fmtNum(A[k] / 12) + '</td><td class="num">' + fmtNum(A[k]) + '</td></tr>';
+      table.innerHTML = '<thead><tr><th></th><th>' + freqLabel(freq) + '</th><th>' + t('tssColMes') + '</th><th>' + t('tssColAnio') + '</th></tr></thead><tbody>' +
+        rw(t('tssRowBruto'), 'bruto') + rw(t('tssRowAfp', pct(ap)), 'afp') + rw(t('tssRowArs', pct(rp)), 'ars') + (state.useIsr ? rw(t('tssRowIsr'), 'isr') : '') +
+        rw(t('tssRowTotal'), 'tot', 'b') + rw(t('tssRowNeto'), 'neto', 'b') +
+        '<tr><th colspan="4">' + t('tssEmployer') + '</th></tr>' +
+        '<tr><td>' + t('tssRowEmpAfp') + '</td><td class="num">' + fmtNum(empAfp * 12 / ppx) + '</td><td class="num">' + fmtNum(empAfp) + '</td><td class="num">' + fmtNum(empAfp * 12) + '</td></tr>' +
+        '<tr><td>' + t('tssRowEmpSfs') + '</td><td class="num">' + fmtNum(empSfs * 12 / ppx) + '</td><td class="num">' + fmtNum(empSfs) + '</td><td class="num">' + fmtNum(empSfs * 12) + '</td></tr></tbody>';
+      $('tssNote').textContent = t('tssNote', { afp:pct(ap), ars:pct(rp), capAfp:fmt(CAP.afp), capSfs:fmt(CAP.sfs) });
+    }
+    function recalcTools() { [calcularTiempo, calcularVacaciones, calcularDobleSueldo, calcularTss].forEach(fn => { try { fn(); } catch(e) { console.error(fn.name, e); } }); }
+
+    // Sincronización: los campos de herramientas se autocompletan desde otros campos
+    // mientras el usuario no los haya editado a mano.
+    const monthlyGross = () => (Number(state.salarioBruto) || 0) * PPY[state.frecuencia] / 12;
+    function syncToolsFromMain(force) {
+      const m = monthlyGross();
+      const val = m > 0 ? String(Math.round(m * 100) / 100) : '';
+      [['vacSalario', val], ['dsSalario', val], ['tssSalario', (Number(state.salarioBruto) || 0) > 0 ? String(state.salarioBruto) : ''], ['tssFreq', state.frecuencia]].forEach(([id, v]) => {
+        if (force || !state.touched[id]) { $(id).value = v; state.tools[id] = v; }
+      });
+    }
+    function bindTools() {
+      const tools = ['fechaIngreso','fechaSalida','vacFechaIngreso','vacFechaSalida','vacSalario','dsSalario','dsMeses','tssSalario','tssFreq'];
+      tools.forEach(id => {
+        const el = $(id);
+        const handler = () => {
+          state.tools[id] = el.value;
+          state.touched[id] = (el.value !== '');           // si lo vacían vuelve a autocompletarse
+          // Fecha de ingreso (Tiempo laborando) → fecha de ingreso de Vacaciones
+          if (id === 'fechaIngreso' && !state.touched.vacFechaIngreso) { $('vacFechaIngreso').value = el.value; state.tools.vacFechaIngreso = el.value; }
+          if (id === 'fechaSalida' && !state.touched.vacFechaSalida) { $('vacFechaSalida').value = el.value; state.tools.vacFechaSalida = el.value; }
+          saveState(); recalcTools();
+        };
+        el.addEventListener('input', handler); el.addEventListener('change', handler);
+      });
+    }
+
+    // ============ FERIADOS ============
+    function renderHolidays() {
+      const sw = $('yearSwitch');
+      sw.innerHTML = Object.keys(HOL).map(y => '<button type="button" class="btn-secondary' + (+y === holYear ? ' on' : '') + '" data-year="' + y + '">' + y + '</button>').join('');
+      const fmtD = (s, o) => { const p = pd(s); return new Date(p.y, p.m - 1, p.d).toLocaleDateString(locale(), o); };
+      const today = dnum(todayObj());
+      let nextFound = false;
+      let html = '<thead><tr><th>' + t('thFecha') + '</th><th>' + t('thFeriado') + '</th><th>' + t('thDia') + '</th><th>' + t('thNota') + '</th></tr></thead><tbody>';
+      HOL[holYear].forEach(([date, key, orig]) => {
+        const p = pd(date), dow = new Date(p.y, p.m - 1, p.d).getDay();
+        const isPast = dnum(p) < today;
+        let cls = isPast ? 'past' : '';
+        let label = '';
+        if (!isPast && !nextFound) { cls = 'next-holiday'; nextFound = true; label = ' ⭐'; }
+        const note = orig ? t('noteMoved', fmtD(orig, { day:'numeric', month:'long' })) : ((dow === 0 || dow === 6) ? t('noteWeekend') : t('noteFixed'));
+        html += '<tr class="' + cls + '"><td>' + fmtD(date, { day:'numeric', month:'long' }) + '</td><td>' + HOL_NAMES[currentLang][key] + label + '</td><td>' + fmtD(date, { weekday:'long' }) + '</td><td>' + note + '</td></tr>';
+      });
+      $('tablaFeriados').innerHTML = html + '</tbody>';
+    }
+
+    // ============ TABS ============
+    function showTab(id) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.toggle('active', el.id === id));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === id));
+    }
+
+    // ============ TEMA (calcado del simulador CNC) ============
+    const btnTheme = $('btnTheme'), themeIcon = $('themeIcon'), themeTextDay = $('themeTextDay'), themeTextNight = $('themeTextNight');
+    const decoSun = $('decoSun'), decoMoon = $('decoMoon'), starsContainer = $('starsContainer'), skyOverlay = $('skyOverlay');
+
+    (function crearEstrellas() {
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < 80; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 3 + 1.5;
+        star.style.cssText = 'width:' + size + 'px;height:' + size + 'px;top:' + (Math.random() * 100) + '%;left:' + (Math.random() * 100) + '%;animation-delay:' + (Math.random() * 3) + 's;animation-duration:' + (Math.random() * 2 + 1.5) + 's;opacity:' + (Math.random() * .5 + .3);
+        frag.appendChild(star);
+      }
+      starsContainer.appendChild(frag);
+    })();
+
+    let decoTimer = null;
+    function mostrarDecoracion(esNoche) {
+      decoSun.classList.remove('visible', 'fading'); decoMoon.classList.remove('visible', 'fading');
+      starsContainer.classList.remove('visible'); skyOverlay.classList.remove('visible');
+      void decoSun.offsetWidth;
+      if (esNoche) {
+        decoMoon.classList.add('visible'); starsContainer.classList.add('visible');
+        skyOverlay.style.background = 'linear-gradient(to bottom, #0b1026, rgba(0,0,0,0))';
+      } else {
+        decoSun.classList.add('visible');
+        skyOverlay.style.background = 'linear-gradient(to bottom, #87CEEB, rgba(255,255,255,0))';
+      }
+      skyOverlay.classList.add('visible');
+      clearTimeout(decoTimer);
+      decoTimer = setTimeout(() => {
+        if (esNoche) { decoMoon.classList.remove('visible'); decoMoon.classList.add('fading'); starsContainer.classList.remove('visible'); }
+        else { decoSun.classList.remove('visible'); decoSun.classList.add('fading'); }
+        skyOverlay.classList.remove('visible');
+        setTimeout(() => { decoSun.classList.remove('fading'); decoMoon.classList.remove('fading'); }, 600);
+      }, 2500);
+    }
+    function actualizarBotonTema() {
+      const esNoche = document.body.classList.contains('night');
+      themeTextDay.textContent = t('themeDay'); themeTextNight.textContent = t('themeNight');
+      themeIcon.textContent = esNoche ? '🌙' : '☀️';
+      themeTextDay.classList.toggle('hidden', esNoche);
+      themeTextNight.classList.toggle('hidden', !esNoche);
+      btnTheme.classList.toggle('night', esNoche);
+    }
+    function actualizarTema(esNoche, animar) {
+      document.documentElement.setAttribute('data-theme', esNoche ? 'dark' : '');
+      document.body.classList.toggle('night', esNoche);
+      state.theme = esNoche ? 'dark' : 'light';
+      actualizarBotonTema();
+      if (animar) mostrarDecoracion(esNoche);
+      saveState();
+    }
+    btnTheme.addEventListener('click', e => { e.stopPropagation(); actualizarTema(!document.body.classList.contains('night'), true); });
+
+    // ============ IDIOMA ============
+    function updateLangSelector() {
+      $('langSelector').setAttribute('data-lang', currentLang);
+      document.querySelectorAll('.lang-selector button').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
+    }
+    function setLanguage(lang, silent) {
+      if (!T[lang]) return;
+      currentLang = lang; state.lang = lang;
+      document.documentElement.lang = lang;
+      updateLangSelector();                                  // la animación del selector no depende de nada más
+      const tr = T[lang];
+      document.querySelectorAll('[data-t]').forEach(el => { const v = tr[el.dataset.t]; if (typeof v === 'string') el.textContent = v; });
+      document.title = tr.title + ' ' + (lang === 'es' ? 'RD' : 'DR') + ' v' + VERSION + ' FrancOS 2.1';
+      $('mainTitle').innerHTML = tr.title + ' <span class="accent">' + tr.titleAccent + '</span>';
+      $('subLabel').textContent = tr.subLabel;
+      $('versionTag').textContent = 'v' + VERSION;
+      actualizarBotonTema(); updateReadonlyButton();
+      renderExpenses(); updateAll(); recalcTools(); renderHolidays();
+      if (openModal) abrirModal(openModal);
+      if (!silent) saveState();
+    }
+
+    // ============ MODALES ============
+    function abrirModal(tipo) {
+      openModal = tipo;
+      let title = '', body = '';
+      if (tipo === 'terms') { title = t('modalTermsTitle'); body = t('modalTermsContent'); }
+      else if (tipo === 'about') {
+        title = t('modalAboutTitle');
+        body = t('modalAbout', VERSION) + '<h3 style="font-size:14px;margin:14px 0 4px;">' + t('changelogTitle') + ' (v' + VERSION + ')</h3><ul>' + T[currentLang].changelog.map(x => '<li>' + x + '</li>').join('') + '</ul>';
+      } else if (tipo === 'ideas') {
+        title = t('modalIdeasTitle');
+        body = '<ul>' + T[currentLang].ideas.map(i => '<li>' + i[0] + ' <strong>' + i[1] + '</strong> — ' + i[2] + '</li>').join('') + '</ul>';
+      }
+      $('modalContent').innerHTML = '<h2>' + title + '</h2><div class="modal-content">' + body + '</div>';
+      $('modalOverlay').classList.add('open');
+    }
+    function cerrarModal() { openModal = null; $('modalOverlay').classList.remove('open'); }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
+
+    // ============ INICIO ============
+    function init() {
+      const loaded = loadState();
+      if (!loaded || !state.periods.length) state.periods = defaultPeriods(state.frecuencia);
+      currentLang = T[state.lang] ? state.lang : 'es';
+      pushStateToInputs();
+      if (!loaded) syncToolsFromMain();
+
+      // Campos de sueldo
+      const num = (id, key, fn) => $(id).addEventListener('input', e => { state[key] = fn ? fn(e.target.value) : (parseFloat(e.target.value) || 0); onMainChange(); });
+      const onMainChange = () => { syncToolsFromMain(); refreshPeriodSums(); updateAll(); recalcTools(); };
+      num('salarioBruto', 'salarioBruto');
+      num('bonoMonto', 'bonoMonto');
+      num('bonoDia', 'bonoDia', v => Math.min(31, Math.max(1, parseInt(v) || 1)));
+      num('afpPct', 'afpPct'); num('arsPct', 'arsPct');
+      [['useAfp','useAfp'],['useArs','useArs'],['useIsr','useIsr']].forEach(([id, key]) => $(id).addEventListener('change', e => { state[key] = e.target.checked; onMainChange(); }));
+      $('isrYear').addEventListener('change', e => { state.isrYear = +e.target.value; onMainChange(); });
+      $('frecuencia').addEventListener('change', onFrecuenciaChange);
+      bindTools();
+
+      // Gastos (delegación)
+      const sections = $('expenseSections');
+      sections.addEventListener('input', e => {
+        const card = e.target.closest('.expense-card'); if (!card) return;
+        const period = state.periods[+card.dataset.period]; if (!period) return;
+        const exp = period.expenses.find(x => x.id === e.target.dataset.id); if (!exp) return;
+        if (e.target.classList.contains('expense-name')) exp.name = e.target.value;
+        else if (e.target.classList.contains('expense-value')) exp.value = parseFloat(e.target.value) || 0;
+        refreshPeriodSums(); updateAll();
+      });
+      sections.addEventListener('click', e => {
+        const del = e.target.closest('.expense-delete');
+        if (del) {
+          const period = state.periods[+del.closest('.expense-card').dataset.period];
+          period.expenses = period.expenses.filter(x => x.id !== del.dataset.id);
+          renderExpenses(); updateAll(); return;
+        }
+        if (e.target.closest('.expense-add-slot')) addExpense(+e.target.closest('.expense-card').dataset.period);
+      });
+
+      document.querySelectorAll('.lang-selector button').forEach(b => b.addEventListener('click', () => { if (b.dataset.lang !== currentLang) setLanguage(b.dataset.lang); }));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
+      $('yearSwitch').addEventListener('click', e => { const b = e.target.closest('[data-year]'); if (b) { holYear = +b.dataset.year; renderHolidays(); } });
+      initChartHover();
+
+      // Tema: por defecto noche (igual que el simulador CNC)
+      actualizarTema(state.theme !== 'light', true);
+      setLanguage(currentLang, true);
+      // Los campos de fecha se rellenan después de pushStateToInputs; recalcular una vez más por seguridad
+      recalcTools();
+    }
+    init();
+  </script>
+</body>
+</html>
