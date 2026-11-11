@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pageTitle">Calculadora Laboral y Financiera RD v2.3.0 FrancOS 2.1</title>
+  <title id="pageTitle">Calculadora Laboral y Financiera RD v2.3.2 FrancOS 2.1</title>
   <meta name="description" content="Calcula tu sueldo neto (AFP/ARS/ISR), presupuesto por período, tiempo laborado, vacaciones y doble sueldo en República Dominicana.">
   <style>
     /* ===== VARIABLES Y TEMAS ===== */
@@ -226,6 +226,73 @@
     .modal-content a { color:var(--accent); }
     .modal-content .github-profile { display:inline-flex; align-items:center; gap:8px; background:var(--bg-editor); padding:6px 14px; border-radius:20px; border:1px solid var(--border-color); margin-top:8px; }
 
+    /* ===== ICONOS PROPIOS ===== */
+    .ic { width:1.2em; height:1.2em; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; vertical-align:-.22em; flex-shrink:0; }
+    .tab-btn, .util-btn, .tool-btn { display:inline-flex; align-items:center; gap:7px; }
+    .tab-btn .ic { width:1.25em; height:1.25em; }
+    .icon-btn { background:transparent; border:1px solid var(--border-color); color:var(--text-muted); width:34px; height:34px; border-radius:5px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all .15s; flex-shrink:0; }
+    .icon-btn:hover { color:var(--danger); border-color:var(--danger); }
+    .next-star { color:var(--warning); }
+
+    /* ===== DESPLEGABLE DE DESCUENTOS ===== */
+    .deduct-grid { display:grid; grid-template-columns:220px 1fr; gap:14px; align-items:start; margin-top:12px; padding-top:12px; border-top:1px dashed var(--border-color); }
+    .ded-total { display:flex; flex-direction:column; gap:2px; }
+    .ded-total .lbl { font-size:12px; font-weight:600; color:var(--text-muted); }
+    .ded-total strong { font-size:22px; color:var(--accent); }
+    .ded-details { background:var(--bg-editor); border:1px solid var(--border-color); border-radius:6px; }
+    .ded-details > summary { list-style:none; cursor:pointer; padding:9px 12px; font-size:12.5px; font-weight:600; color:var(--text-main); display:flex; align-items:center; gap:8px; user-select:none; }
+    .ded-details > summary::-webkit-details-marker { display:none; }
+    .ded-details > summary .ic { transition:transform .2s; }
+    .ded-details[open] > summary .ic { transform:rotate(180deg); }
+    .ded-details > summary:hover { color:var(--accent); }
+    .ded-body { padding:4px 12px 12px; }
+    .ded-details > .table-scroll { margin:0 8px 8px; }
+
+    /* ===== NAVEGACIÓN DE HERRAMIENTAS ===== */
+    .tool-nav { display:flex; flex-wrap:wrap; gap:6px; }
+    .tool-btn { background:var(--bg-panel); color:var(--text-muted); border:1px solid var(--border-color); padding:7px 12px; border-radius:6px; cursor:pointer; font-size:12.5px; font-weight:600; transition:all .15s; }
+    .tool-btn:hover { color:var(--accent); border-color:var(--accent); }
+    .tool-btn.active { background:var(--accent); color:var(--btn-primary-text); border-color:var(--accent); }
+    .tool-card { display:none; }
+    .tool-card.active { display:block; }
+    .static-val { font-size:20px; font-weight:700; color:var(--accent); padding:4px 0; font-variant-numeric:tabular-nums; }
+    .muted-note { font-size:12px; color:var(--text-muted); }
+    .fx-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .inline-input[type="number"] { padding:6px 8px; min-width:90px; }
+
+    /* Metas */
+    .goal-row, .debt-row { background:var(--bg-editor); border:1px solid var(--border-color); border-radius:8px; padding:12px; margin-top:8px; }
+    .row-fields { display:grid; gap:8px; align-items:end; }
+    .goal-fields { grid-template-columns:2fr 1fr 1fr 1fr auto; }
+    .debt-fields { grid-template-columns:2fr 1fr 1fr 1fr auto; }
+    .progress { height:12px; background:var(--bg-panel); border:1px solid var(--border-color); border-radius:20px; overflow:hidden; margin-top:10px; }
+    .progress-fill { height:100%; width:0; background:var(--accent); border-radius:20px; transition:width .35s ease; }
+    .progress-fill.done { background:var(--color-ahorro); }
+    .goal-meta { display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--text-muted); margin-top:6px; }
+    .goal-meta strong { color:var(--text-main); }
+
+    /* Deudas */
+    .strat-card { background:var(--bg-editor); border:1px solid var(--border-color); border-radius:8px; padding:12px 14px; }
+    .strat-card h4 { margin:0 0 8px; font-size:13px; color:var(--accent); }
+    .strat-order { margin-top:6px; font-size:12.5px; }
+    .strat-order ol { margin:4px 0 0; padding-left:20px; }
+    .strat-order li { padding:1px 0; }
+
+    /* Historial */
+    .hist-chart { margin-top:14px; }
+    .hist-svg { width:100%; height:auto; display:block; }
+    .axis-t { font-size:10.5px; fill:var(--text-muted); }
+    .hist-svg .hm:hover { fill:var(--accent); fill-opacity:.1; }
+    .hist-chart .empty-state { background:var(--bg-editor); border:1px dashed var(--border-color); border-radius:6px; padding:30px 14px; }
+    .data-table input.inline-input { width:100%; min-width:70px; }
+
+    @media (max-width:900px) {
+      .deduct-grid { grid-template-columns:1fr; }
+      .goal-fields, .debt-fields { grid-template-columns:1fr 1fr; }
+      .goal-fields .icon-btn, .debt-fields .icon-btn { justify-self:end; }
+    }
+    @media (max-width:600px) { .tool-btn { padding:6px 9px; font-size:11.5px; } }
+
     @media (max-width:900px) {
       .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr; }
       .header-container { flex-direction:column; align-items:flex-start; }
@@ -252,6 +319,33 @@
   </style>
 </head>
 <body>
+  <!-- Iconos propios (SVG, trazo) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="ic-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2.5"/><path d="M3 10h18"/><circle cx="17" cy="15" r="1.2"/><path d="M7 6l8-3 2 3"/></symbol>
+      <symbol id="ic-toolbox" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M9 8V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V8M3 13h18M10.5 13v2h3v-2"/></symbol>
+      <symbol id="ic-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M16 3v4M8 3v4M3 10h18M8 14h2M14 14h2M8 17.5h2"/></symbol>
+      <symbol id="ic-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></symbol>
+      <symbol id="ic-unlock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 7.6-1.7"/></symbol>
+      <symbol id="ic-save" viewBox="0 0 24 24"><path d="M5 3h11l4 4v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v5h8V3M7 21v-7h10v7"/></symbol>
+      <symbol id="ic-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10.5l5 5 5-5M4 20h16"/></symbol>
+      <symbol id="ic-printer" viewBox="0 0 24 24"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></symbol>
+      <symbol id="ic-sparkle" viewBox="0 0 24 24"><path d="M11 3l1.9 5.4L18 10l-5.1 1.6L11 17l-1.9-5.4L4 10l5.1-1.6z"/><path d="M19 15v5M16.5 17.5h5"/></symbol>
+      <symbol id="ic-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M9 7V4h6v3"/></symbol>
+      <symbol id="ic-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+      <symbol id="ic-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+      <symbol id="ic-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></symbol>
+      <symbol id="ic-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8M12 8C12 5.5 10.5 3.5 8.5 3.5a2 2 0 0 0 0 4.5M12 8c0-2.5 1.5-4.5 3.5-4.5a2 2 0 0 1 0 4.5"/></symbol>
+      <symbol id="ic-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.8-3.4 8-8 9-4.6-1-8-4.2-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+      <symbol id="ic-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M9.5 3h5M18.5 6l1.2-1.2"/></symbol>
+      <symbol id="ic-exchange" viewBox="0 0 24 24"><path d="M4 8h15l-3.5-3.5M20 16H5l3.5 3.5"/></symbol>
+      <symbol id="ic-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></symbol>
+      <symbol id="ic-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h4"/></symbol>
+      <symbol id="ic-chart" viewBox="0 0 24 24"><path d="M4 3v17h17"/><rect x="8" y="11" width="3" height="6" rx=".5"/><rect x="13" y="7" width="3" height="10" rx=".5"/><rect x="18" y="13" width="2" height="4" rx=".5"/></symbol>
+      <symbol id="ic-file" viewBox="0 0 24 24"><path d="M6 3h8.5L19 7.5V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5M8.5 13h7M8.5 17h7"/></symbol>
+      <symbol id="ic-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9L12 16.9l-5.2 2.9 1-5.9L3.5 9.7l5.9-.8z"/></symbol>
+    </defs>
+  </svg>
   <div class="sky-overlay" id="skyOverlay"></div>
   <div class="stars" id="starsContainer" aria-hidden="true"></div>
 
@@ -279,18 +373,18 @@
   </header>
 
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="tab-sueldo">💰 <span data-t="tabSueldo">Sueldo y Presupuesto</span></button>
-    <button class="tab-btn" data-tab="tab-herramientas">🧰 <span data-t="tabHerramientas">Herramientas Laborales</span></button>
-    <button class="tab-btn" data-tab="tab-feriados">📅 <span data-t="tabFeriados">Feriados y Enlaces</span></button>
+    <button class="tab-btn active" data-tab="tab-sueldo"><svg class="ic"><use href="#ic-wallet"/></svg> <span data-t="tabSueldo">Sueldo y Presupuesto</span></button>
+    <button class="tab-btn" data-tab="tab-herramientas"><svg class="ic"><use href="#ic-toolbox"/></svg> <span data-t="tabHerramientas">Herramientas Laborales</span></button>
+    <button class="tab-btn" data-tab="tab-feriados"><svg class="ic"><use href="#ic-calendar"/></svg> <span data-t="tabFeriados">Feriados y Enlaces</span></button>
   </nav>
 
   <div class="utility-bar" id="utilityBar">
-    <button class="util-btn" id="btnReadonly" onclick="toggleReadonly()">🔒 <span data-t="btnReadonlyOff">Modo lectura: OFF</span></button>
-    <button class="util-btn" onclick="saveSnapshot()">💾 <span data-t="btnSaveSnapshot">Guardar en historial</span></button>
-    <button class="util-btn" onclick="exportCSV()">📥 <span data-t="btnExportCSV">Exportar CSV</span></button>
-    <button class="util-btn" onclick="window.print()">🖨️ <span data-t="btnPrint">Imprimir / PDF</span></button>
-    <button class="util-btn" onclick="loadExample()">✨ <span data-t="btnLoadExample">Cargar ejemplo</span></button>
-    <button class="util-btn util-danger" onclick="clearAll()">🧹 <span data-t="btnClearAll">Limpiar todo</span></button>
+    <button class="util-btn" id="btnReadonly" onclick="toggleReadonly()"><svg class="ic"><use href="#ic-lock"/></svg> <span data-t="btnReadonlyOff">Modo lectura: OFF</span></button>
+    <button class="util-btn" onclick="saveSnapshot()"><svg class="ic"><use href="#ic-save"/></svg> <span data-t="btnSaveSnapshot">Guardar en historial</span></button>
+    <button class="util-btn" onclick="exportCSV()"><svg class="ic"><use href="#ic-download"/></svg> <span data-t="btnExportCSV">Exportar CSV</span></button>
+    <button class="util-btn" onclick="window.print()"><svg class="ic"><use href="#ic-printer"/></svg> <span data-t="btnPrint">Imprimir / PDF</span></button>
+    <button class="util-btn" onclick="loadExample()"><svg class="ic"><use href="#ic-sparkle"/></svg> <span data-t="btnLoadExample">Cargar ejemplo</span></button>
+    <button class="util-btn util-danger" onclick="clearAll()"><svg class="ic"><use href="#ic-trash"/></svg> <span data-t="btnClearAll">Limpiar todo</span></button>
   </div>
 
   <main class="container">
@@ -322,26 +416,31 @@
             <input type="number" id="bonoMonto" value="0" min="0" step="0.01">
           </div>
         </div>
-        <div class="grid-4 deduct-grid">
-          <div class="deduct-item">
-            <label class="chk"><input type="checkbox" id="useAfp"> <span data-t="chkAfp">Descontar AFP (pensión)</span></label>
-            <div class="pct-row"><input class="inline-input" type="number" id="afpPct" min="0" max="100" step="0.01"><span>%</span></div>
+        <div class="deduct-grid">
+          <div class="ded-total">
+            <span class="lbl" data-t="lblDedTotal">Descuento de ley aplicado</span>
+            <strong id="dedTotalPct">0%</strong>
           </div>
-          <div class="deduct-item">
-            <label class="chk"><input type="checkbox" id="useArs"> <span data-t="chkArs">Descontar ARS / SFS (salud)</span></label>
-            <div class="pct-row"><input class="inline-input" type="number" id="arsPct" min="0" max="100" step="0.01"><span>%</span></div>
-          </div>
-          <div class="deduct-item">
-            <label class="chk"><input type="checkbox" id="useIsr"> <span data-t="chkIsr">Calcular ISR (DGII)</span></label>
-            <select class="inline-input" id="isrYear">
-              <option value="2026">2026</option>
-              <option value="2027">2027</option>
-            </select>
-          </div>
-          <div class="deduct-item">
-            <span class="chk" style="cursor:default" data-t="lblDedTotal">Descuento de ley aplicado</span>
-            <strong id="dedTotalPct" style="font-size:18px; color:var(--accent);">0%</strong>
-          </div>
+          <details class="ded-details" id="dedDetails">
+            <summary><svg class="ic"><use href="#ic-chevron"/></svg><span data-t="dedOptions">Opciones de descuento: AFP, ARS e ISR</span></summary>
+            <div class="ded-body"><div class="grid-3">
+              <div class="deduct-item">
+                <label class="chk"><input type="checkbox" id="useAfp"> <span data-t="chkAfp">Descontar AFP (pensión)</span></label>
+                <div class="pct-row"><input class="inline-input" type="number" id="afpPct" min="0" max="100" step="0.01"><span>%</span></div>
+              </div>
+              <div class="deduct-item">
+                <label class="chk"><input type="checkbox" id="useArs"> <span data-t="chkArs">Descontar ARS / SFS (salud)</span></label>
+                <div class="pct-row"><input class="inline-input" type="number" id="arsPct" min="0" max="100" step="0.01"><span>%</span></div>
+              </div>
+              <div class="deduct-item">
+                <label class="chk"><input type="checkbox" id="useIsr"> <span data-t="chkIsr">Calcular ISR (DGII)</span></label>
+                <select class="inline-input" id="isrYear">
+                  <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                </select>
+              </div>
+            </div></div>
+          </details>
         </div>
         <div class="info-note" id="deductNote"></div>
       </div>
@@ -378,10 +477,23 @@
       </div>
     </section>
 
-    <!-- ===== TAB 2: HERRAMIENTAS ===== -->
+        <!-- ===== TAB 2: HERRAMIENTAS ===== -->
     <section id="tab-herramientas" class="tab-content">
 
-      <div class="card">
+      <div class="tool-nav" id="toolNav">
+        <button type="button" class="tool-btn active" data-tool="tiempo"><svg class="ic"><use href="#ic-clock"/></svg><span data-t="navTiempo">Tiempo laborando</span></button>
+        <button type="button" class="tool-btn" data-tool="vac"><svg class="ic"><use href="#ic-sun"/></svg><span data-t="navVac">Vacaciones</span></button>
+        <button type="button" class="tool-btn" data-tool="ds"><svg class="ic"><use href="#ic-gift"/></svg><span data-t="navDs">Doble sueldo</span></button>
+        <button type="button" class="tool-btn" data-tool="tss"><svg class="ic"><use href="#ic-shield"/></svg><span data-t="navTss">AFP / ARS</span></button>
+        <button type="button" class="tool-btn" data-tool="extras"><svg class="ic"><use href="#ic-timer"/></svg><span data-t="navExtras">Horas extras</span></button>
+        <button type="button" class="tool-btn" data-tool="fx"><svg class="ic"><use href="#ic-exchange"/></svg><span data-t="navFx">Conversor USD</span></button>
+        <button type="button" class="tool-btn" data-tool="metas"><svg class="ic"><use href="#ic-target"/></svg><span data-t="navMetas">Metas de ahorro</span></button>
+        <button type="button" class="tool-btn" data-tool="deudas"><svg class="ic"><use href="#ic-card"/></svg><span data-t="navDeudas">Deudas</span></button>
+        <button type="button" class="tool-btn" data-tool="hist"><svg class="ic"><use href="#ic-chart"/></svg><span data-t="navHist">Historial mensual</span></button>
+        <button type="button" class="tool-btn" data-tool="ces"><svg class="ic"><use href="#ic-file"/></svg><span data-t="navCes">Cesantía</span></button>
+      </div>
+
+      <div class="card tool-card active" data-tool="tiempo">
         <h2 data-t="titleTiempo">Tiempo Laborando</h2>
         <div class="grid-2">
           <div class="form-group">
@@ -399,7 +511,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card tool-card" data-tool="vac">
         <h2 data-t="titleVacaciones">Vacaciones Proporcionales</h2>
         <div class="grid-3">
           <div class="form-group">
@@ -424,7 +536,7 @@
         <div class="info-note" data-t="notaVacaciones"></div>
       </div>
 
-      <div class="card">
+      <div class="card tool-card" data-tool="ds">
         <h2 data-t="titleDobleSueldo">Doble Sueldo / Regalía Pascual</h2>
         <div class="grid-2">
           <div class="form-group">
@@ -442,7 +554,7 @@
         <div class="info-note" data-t="notaDobleSueldo"></div>
       </div>
 
-      <div class="card">
+      <div class="card tool-card" data-tool="tss">
         <h2 data-t="titleTss">Calculadora de Descuentos AFP / ARS</h2>
         <div class="grid-2">
           <div class="form-group">
@@ -462,12 +574,124 @@
         <div class="info-note" id="tssNote"></div>
       </div>
 
-      <div class="card">
+      <div class="card tool-card" data-tool="extras">
+        <h2 data-t="titleExtras">Horas Extras y Recargos</h2>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="exSalario" data-t="labelExSalario">Salario mensual (RD$)</label>
+            <input type="number" id="exSalario" value="" min="0" step="0.01">
+          </div>
+          <div class="form-group">
+            <span class="lbl" data-t="labelExHora">Valor de la hora ordinaria</span>
+            <div class="static-val" id="exHora">—</div>
+          </div>
+        </div>
+        <div class="grid-4" style="margin-top:12px;">
+          <div class="form-group"><label for="exH135" data-t="exH135">Horas extra al 135 %</label><input type="number" id="exH135" value="" min="0" step="0.25"></div>
+          <div class="form-group"><label for="exH200" data-t="exH200">Horas extra al 200 %</label><input type="number" id="exH200" value="" min="0" step="0.25"></div>
+          <div class="form-group"><label for="exNight" data-t="exNight">Horas nocturnas</label><input type="number" id="exNight" value="" min="0" step="0.25"></div>
+          <div class="form-group"><label for="exHol" data-t="exHol">Horas en feriado o descanso</label><input type="number" id="exHol" value="" min="0" step="0.25"></div>
+        </div>
+        <div class="result-box" style="margin-top:10px;">
+          <div class="result-row"><span class="label" data-t="resEx135">Horas extra al 135 %</span><span class="value" id="resEx135">—</span></div>
+          <div class="result-row"><span class="label" data-t="resEx200">Horas extra al 200 %</span><span class="value" id="resEx200">—</span></div>
+          <div class="result-row"><span class="label" data-t="resExNight">Recargo nocturno (15 %)</span><span class="value" id="resExNight">—</span></div>
+          <div class="result-row"><span class="label" data-t="resExHol">Recargo feriado / descanso (100 %)</span><span class="value" id="resExHol">—</span></div>
+          <div class="result-row total-row"><span class="label" data-t="resExTotal">Total adicional bruto</span><span class="value positive" id="resExTotal">—</span></div>
+          <div class="result-row"><span class="label" data-t="resExNet">Total adicional neto estimado</span><span class="value positive" id="resExNet">—</span></div>
+        </div>
+        <div class="info-note" data-t="notaExtras"></div>
+      </div>
+
+      <div class="card tool-card" data-tool="fx">
+        <h2 data-t="titleFx">Conversor RD$ ↔ USD</h2>
+        <div class="grid-3">
+          <div class="form-group"><label for="fxRate" data-t="labelFxRate">Tasa (RD$ por 1 USD)</label><input type="number" id="fxRate" value="" min="0" step="0.01"></div>
+          <div class="form-group"><label for="fxRd" data-t="labelFxRd">Monto en RD$</label><input type="number" id="fxRd" value="" min="0" step="0.01"></div>
+          <div class="form-group"><label for="fxUsd" data-t="labelFxUsd">Monto en USD</label><input type="number" id="fxUsd" value="" min="0" step="0.01"></div>
+        </div>
+        <div class="fx-actions">
+          <button type="button" class="btn-secondary" id="btnFxFetch"><span data-t="btnFxFetch">Obtener tasa del día</span></button>
+          <span class="muted-note" id="fxStatus"></span>
+        </div>
+        <div class="result-box" style="margin-top:10px;">
+          <div class="result-row"><span class="label" data-t="resFxNet">Tu sueldo neto mensual en USD</span><span class="value positive" id="resFxNet">—</span></div>
+          <div class="result-row"><span class="label" data-t="resFxGross">Tu sueldo bruto mensual en USD</span><span class="value" id="resFxGross">—</span></div>
+          <div class="result-row"><span class="label" data-t="resFxK">RD$1,000 equivalen a</span><span class="value" id="resFxK">—</span></div>
+        </div>
+        <div class="info-note" data-t="notaFx"></div>
+      </div>
+
+      <div class="card tool-card" data-tool="metas">
+        <h2 data-t="titleMetas">Metas de Ahorro</h2>
+        <div class="grid-2">
+          <div>
+            <div class="form-group">
+              <label for="efMonths" data-t="labelEfMonths">Meses de gastos para el fondo de emergencia</label>
+              <input type="number" id="efMonths" value="6" min="0" max="36" step="1">
+            </div>
+            <button type="button" class="btn" id="btnCreateEf" style="margin-top:10px;"><span data-t="btnCreateEf">Crear meta de fondo de emergencia</span></button>
+          </div>
+          <div class="result-box">
+            <div class="result-row"><span class="label" data-t="resEfExpenses">Gastos mensuales</span><span class="value" id="resEfExpenses">—</span></div>
+            <div class="result-row"><span class="label" data-t="resEfTarget">Fondo de emergencia sugerido</span><span class="value positive" id="resEfTarget">—</span></div>
+            <div class="result-row"><span class="label" data-t="resEfSaving">Ahorro mensual actual</span><span class="value" id="resEfSaving">—</span></div>
+          </div>
+        </div>
+        <h3 class="sub" data-t="subGoals">Mis metas</h3>
+        <div id="goalsList"></div>
+        <button type="button" class="btn-secondary" id="btnAddGoal" style="margin-top:10px;"><span data-t="btnAddGoal">Agregar meta</span></button>
+        <div class="info-note" data-t="notaMetas"></div>
+      </div>
+
+      <div class="card tool-card" data-tool="deudas">
+        <h2 data-t="titleDeudas">Deudas y Préstamos</h2>
+        <h3 class="sub" style="margin-top:0;" data-t="subLoan">Simulador de cuotas</h3>
+        <div class="grid-3">
+          <div class="form-group"><label for="loanAmt" data-t="labelLoanAmt">Monto del préstamo (RD$)</label><input type="number" id="loanAmt" value="" min="0" step="0.01"></div>
+          <div class="form-group"><label for="loanRate" data-t="labelLoanRate">Tasa de interés anual (%)</label><input type="number" id="loanRate" value="" min="0" step="0.01"></div>
+          <div class="form-group"><label for="loanMonths" data-t="labelLoanMonths">Plazo (meses)</label><input type="number" id="loanMonths" value="" min="1" max="600" step="1"></div>
+        </div>
+        <div class="result-box" style="margin-top:10px;">
+          <div class="result-row total-row"><span class="label" data-t="resLoanPmt">Cuota mensual</span><span class="value positive" id="resLoanPmt">—</span></div>
+          <div class="result-row"><span class="label" data-t="resLoanInt">Total de intereses</span><span class="value negative" id="resLoanInt">—</span></div>
+          <div class="result-row"><span class="label" data-t="resLoanTotal">Total a pagar</span><span class="value" id="resLoanTotal">—</span></div>
+        </div>
+        <details class="ded-details" style="margin-top:10px;">
+          <summary><svg class="ic"><use href="#ic-chevron"/></svg><span data-t="amortTitle">Ver tabla de amortización</span></summary>
+          <div class="table-scroll" style="max-height:280px; overflow:auto;"><table class="data-table" id="amortTable"></table></div>
+        </details>
+
+        <h3 class="sub" data-t="subPayoff">Estrategia: bola de nieve vs. avalancha</h3>
+        <div id="debtList"></div>
+        <button type="button" class="btn-secondary" id="btnAddDebt" style="margin-top:10px;"><span data-t="btnAddDebt">Agregar deuda</span></button>
+        <div class="grid-2" style="margin-top:12px;">
+          <div class="form-group"><label for="debtBudget" data-t="labelDebtBudget">Pago mensual total para deudas (RD$)</label><input type="number" id="debtBudget" value="" min="0" step="0.01"></div>
+        </div>
+        <div id="debtResult" style="margin-top:10px;"></div>
+        <div class="info-note" data-t="notaDeudas"></div>
+      </div>
+
+      <div class="card tool-card" data-tool="hist">
+        <h2 data-t="titleHist">Historial Mensual</h2>
+        <div class="grid-3">
+          <div class="form-group"><label for="histYear" data-t="labelHistYear">Año</label><select id="histYear"></select></div>
+          <div class="form-group"><label for="histMonth" data-t="labelHistMonth">Mes a guardar</label><select id="histMonth"></select></div>
+          <div class="form-group" style="justify-content:flex-end;"><button type="button" class="btn" id="btnSaveMonth"><span data-t="btnSaveMonth">Guardar este mes desde la calculadora</span></button></div>
+        </div>
+        <div class="hist-chart" id="histChartBox"></div>
+        <div class="chart-legend" id="histLegend" style="margin-top:6px;"></div>
+        <div class="result-box" id="histSummary" style="margin-top:12px;"></div>
+        <div class="table-scroll"><table class="data-table" id="histTable"></table></div>
+        <div class="info-note" data-t="notaHist"></div>
+      </div>
+
+      <div class="card tool-card" data-tool="ces">
         <h2 data-t="titleCesantia">Cesantía y Prestaciones Laborales</h2>
         <div class="link-card">
           <div class="link-text">
             <strong data-t="textoCesantia">¿Necesitas calcular tu cesantía o prestaciones?</strong>
-            <p data-t="textoCesantiaDesc">Usa la calculadora oficial del Ministerio de Trabajo.</p>
+            <p data-t="textoCesantiaDesc">Consulta el portal del Ministerio de Trabajo.</p>
           </div>
           <a href="https://mt.gob.do/" target="_blank" rel="noopener" class="btn"><span data-t="btnCesantia">Ir al Ministerio de Trabajo →</span></a>
         </div>
@@ -498,14 +722,12 @@
 
   <footer class="app-footer">
     <div class="footer-left">
-      <span class="version" id="versionTag">v2.3.0</span>
+      <span class="version" id="versionTag">v2.3.2</span>
       <span class="status-indicator"><span class="status-dot"></span><span id="statusText" data-t="statusText">Sistemas estables</span></span>
       <span>|</span>
       <a onclick="abrirModal('terms')" data-t="footerTerms">Términos</a>
       <span>|</span>
       <a onclick="abrirModal('about')" data-t="footerAbout">Acerca de</a>
-      <span>|</span>
-      <a onclick="abrirModal('ideas')" data-t="footerIdeas">Ideas</a>
       <span>|</span>
       <a href="mailto:francos.dev@outlook.com?subject=Calculadora%20Laboral%20RD" data-t="footerContact">Contacto</a>
     </div>
@@ -531,7 +753,7 @@
     // ===================================================================
     //  CALCULADORA LABORAL Y FINANCIERA RD — FrancOS 2.1
     // ===================================================================
-    const VERSION = '2.3.0';
+    const VERSION = '2.3.2';
     const STORAGE_KEY = 'francos_calc_rd_v5';
     const $ = id => document.getElementById(id);
 
@@ -598,28 +820,26 @@
         thFecha:'Fecha', thFeriado:'Feriado', thDia:'Día', thNota:'Nota',
         noteMoved:(d)=>'Trasladado desde el ' + d, noteFixed:'Fecha fija', noteWeekend:'Cae en fin de semana (no se mueve)', nextHoliday:'Próximo feriado',
         notaFeriados:'Lista de referencia según la Ley 139-97 y los calendarios publicados por el Ministerio de Trabajo. Confirma siempre las fechas en la fuente oficial.',
-        statusText:'Sistemas estables', footerTerms:'Términos', footerAbout:'Acerca de', footerContact:'Contacto', footerIdeas:'Ideas', footerReport:'Reportar bug',
+        statusText:'Sistemas estables', footerTerms:'Términos', footerAbout:'Acerca de', footerContact:'Contacto', footerReport:'Reportar bug',
         confirmFreq:'Cambiar la frecuencia reiniciará los gastos con los valores por defecto de la nueva frecuencia. ¿Continuar?',
         confirmClearAll:'¿Borrar todos los datos y volver a cero?',
         confirmClearHistory:'¿Vaciar todo el historial?',
         confirmResetExpenses:'¿Restablecer TODOS los gastos de TODOS los períodos a los valores por defecto?',
-        exampleLoaded:'Ejemplo cargado (basado en tu hoja de Excel). Edita los valores a tu gusto.',
+        exampleLoaded:'Ejemplo cargado. Los valores son de muestra; edítalos a tu gusto.',
         snapshotSaved:'Cálculo guardado en el historial.',
         invalidDate:'Fecha inválida',
         placeholderName:'Nombre del gasto', addExpense:'Agregar gasto', removeExpense:'Eliminar gasto',
         periodMes:'Mes', periodQuincena:(n)=>'Quincena ' + n + (n===1?' (días 1-15)':' (días 16-31)'), periodSemana:(n)=>'Semana ' + n,
         yearS:(n)=> n + (n===1?' año':' años'), monthS:(n)=> n + (n===1?' mes':' meses'), dayS:(n)=> n + (n===1?' día':' días'),
         csvPeriodo:'Período', csvGasto:'Gasto', csvMonto:'Monto', csvResumen:'Resumen', csvBruto:'Bruto', csvNeto:'Neto', csvTotalGastos:'Total gastos', csvRestante:'Restante',
-        exp:{pasaje:'Pasaje', comida:'Comida', renta:'Renta', internet:'Internet', streaming:'Streaming', recarga:'Recarga', barberia:'Barbería y gastos personales', ahorro:'Ahorro', ahorro2:'Ahorro 2', motor:'Mantenimiento de motor'},
+        exp:{pasaje:'Pasaje', comida:'Comida', renta:'Renta', internet:'Internet', streaming:'Streaming', recarga:'Recargas', barberia:'Barbería y gastos personales', ahorro:'Ahorro', ahorro2:'Ahorro 2', motor:'Mantenimiento de motor', medicinas:'Medicamentos'},
         modalTermsTitle:'Términos y Condiciones',
         modalTermsContent:'<p>Esta calculadora se proporciona con fines informativos y educativos. Los resultados son estimaciones basadas en las tasas y fórmulas vigentes (TSS, DGII y Código de Trabajo), pero no sustituyen los cálculos oficiales del Ministerio de Trabajo, la TSS ni la DGII.</p><p>Los datos que ingresas se guardan únicamente en tu navegador (almacenamiento local) y no se envían a ningún servidor.</p><p>Verifica siempre los montos con las entidades oficiales antes de tomar decisiones laborales o financieras.</p>',
         modalAboutTitle:'Acerca de',
         modalAbout:(v)=>'<p><strong>Calculadora Laboral y Financiera RD</strong> — v' + v + '</p><p>Herramienta para estimar sueldo neto, presupuesto por período, vacaciones, regalía pascual y tiempo laborado en República Dominicana.</p><p>Desarrollado por <strong>FrancOS</strong> — Mecatrónico. Apasionado por la electrónica, la programación y el control numérico.</p><div class="github-profile">' + GH_SVG + '<a href="https://github.com/SimuladorCNC2D" target="_blank" rel="noopener">github.com/SimuladorCNC2D</a></div><p style="margin-top:10px;">💡 <a href="mailto:francos.dev@outlook.com">Contactar por correo</a> para reportar bugs o sugerencias.</p>',
         changelogTitle:'Novedades de esta versión',
-        changelog:['Corregida la carga inicial: gastos y resultados aparecen al abrir la página.','Botón de modo día/noche idéntico al del simulador CNC (sol, luna y estrellas).','El cambio de idioma traduce toda la interfaz al instante y el selector ES/EN se desliza.','Todos los períodos visibles a la vez, con gráfico de pastel interactivo y barras comparativas.','AFP/ARS/ISR configurables y calculadora AFP/ARS en Herramientas.','Herramientas con cálculo automático y fecha de ingreso sincronizada con vacaciones.'],
-        modalIdeasTitle:'Ideas para seguir mejorando',
-        ideas:[['⏱️','Horas extras y recargos','Calcula horas extra (135 %/200 %), trabajo nocturno y feriados trabajados.'],['🧾','Liquidación completa','Preaviso, cesantía y vacaciones no disfrutadas en una sola calculadora.'],['🎯','Metas de ahorro','Fondo de emergencia y metas con barra de progreso mensual.'],['💳','Deudas y préstamos','Simulador de cuotas y estrategia bola de nieve / avalancha.'],['📈','Historial mensual','Gráfico anual de neto, gastos y ahorro comparando meses.'],['📊','Exportar a Excel (.xlsx)','Exportación e importación directa de tu hoja de presupuesto.'],['🔔','Recordatorios de pago','Archivo de calendario (.ics) con tus quincenas, bonos y feriados.'],['💱','Conversor RD$ ↔ USD','Con tasa del día para sueldos o metas en dólares.'],['📱','App instalable (PWA)','Funciona sin conexión y se instala en el teléfono.']]
-      },
+        changelog:['Se quitó «Ideas» del pie de página.','Iconos propios en pestañas, botones y herramientas (el botón día/noche se mantiene).','«Descuento de ley aplicado» a la izquierda y opciones de AFP, ARS e ISR en un desplegable.','Nuevas herramientas: horas extras y recargos, conversor RD$ ↔ USD, metas de ahorro, deudas y préstamos, e historial mensual.','Ejemplo con datos genéricos (medicamentos, recargas).'],
+              },
       en: {
         title:'Labor & Financial Calculator', titleAccent:'DR',
         subLabel:'Net salary, budget and labor tools.',
@@ -680,31 +900,93 @@
         thFecha:'Date', thFeriado:'Holiday', thDia:'Day', thNota:'Note',
         noteMoved:(d)=>'Moved from ' + d, noteFixed:'Fixed date', noteWeekend:'Falls on a weekend (not moved)', nextHoliday:'Next holiday',
         notaFeriados:'Reference list based on Law 139-97 and the calendars published by the Ministry of Labor. Always verify dates with the official source.',
-        statusText:'Systems stable', footerTerms:'Terms', footerAbout:'About', footerContact:'Contact', footerIdeas:'Ideas', footerReport:'Report bug',
+        statusText:'Systems stable', footerTerms:'Terms', footerAbout:'About', footerContact:'Contact', footerReport:'Report bug',
         confirmFreq:'Changing the frequency will reset expenses to the defaults of the new frequency. Continue?',
         confirmClearAll:'Delete all data and reset to zero?',
         confirmClearHistory:'Clear all history?',
         confirmResetExpenses:'Reset ALL expenses from ALL periods to defaults?',
-        exampleLoaded:'Example loaded (based on your Excel sheet). Edit the values as you like.',
+        exampleLoaded:'Example loaded. The values are samples; edit them as you like.',
         snapshotSaved:'Calculation saved to history.',
         invalidDate:'Invalid date',
         placeholderName:'Expense name', addExpense:'Add expense', removeExpense:'Remove expense',
         periodMes:'Month', periodQuincena:(n)=>'Fortnight ' + n + (n===1?' (days 1-15)':' (days 16-31)'), periodSemana:(n)=>'Week ' + n,
         yearS:(n)=> n + (n===1?' year':' years'), monthS:(n)=> n + (n===1?' month':' months'), dayS:(n)=> n + (n===1?' day':' days'),
         csvPeriodo:'Period', csvGasto:'Expense', csvMonto:'Amount', csvResumen:'Summary', csvBruto:'Gross', csvNeto:'Net', csvTotalGastos:'Total expenses', csvRestante:'Remaining',
-        exp:{pasaje:'Transport', comida:'Food', renta:'Rent', internet:'Internet', streaming:'Streaming', recarga:'Phone top-up', barberia:'Barber & personal expenses', ahorro:'Savings', ahorro2:'Savings 2', motor:'Motorcycle maintenance'},
+        exp:{pasaje:'Transport', comida:'Food', renta:'Rent', internet:'Internet', streaming:'Streaming', recarga:'Phone top-ups', barberia:'Barber & personal expenses', ahorro:'Savings', ahorro2:'Savings 2', motor:'Motorcycle maintenance', medicinas:'Medicines'},
         modalTermsTitle:'Terms and Conditions',
         modalTermsContent:'<p>This calculator is provided for informational and educational purposes. Results are estimates based on current rates and formulas (TSS, DGII and the Labor Code), but they do not replace official calculations from the Ministry of Labor, TSS or DGII.</p><p>The data you enter is stored only in your browser (local storage) and is never sent to any server.</p><p>Always verify amounts with official entities before making labor or financial decisions.</p>',
         modalAboutTitle:'About',
         modalAbout:(v)=>'<p><strong>Labor &amp; Financial Calculator DR</strong> — v' + v + '</p><p>Tool to estimate net salary, per-period budget, vacation, Christmas bonus and time worked in the Dominican Republic.</p><p>Developed by <strong>FrancOS</strong> — Mechatronics. Passionate about electronics, programming and numerical control.</p><div class="github-profile">' + GH_SVG + '<a href="https://github.com/SimuladorCNC2D" target="_blank" rel="noopener">github.com/SimuladorCNC2D</a></div><p style="margin-top:10px;">💡 <a href="mailto:francos.dev@outlook.com">Contact by email</a> to report bugs or suggestions.</p>',
         changelogTitle:'What\'s new in this version',
-        changelog:['Fixed initial load: expenses and results show up as soon as the page opens.','Day/night button identical to the CNC simulator (sun, moon and stars).','Switching language translates the whole interface instantly and the ES/EN selector slides.','All periods visible at once, with an interactive pie chart and comparison bars.','Configurable AFP/ARS/ISR and an AFP/ARS calculator in Tools.','Tools calculate automatically and the start date syncs with vacation.'],
-        modalIdeasTitle:'Ideas to keep improving',
-        ideas:[['⏱️','Overtime and surcharges','Compute overtime (135% / 200%), night work and worked holidays.'],['🧾','Full severance','Notice, severance and unused vacation in a single calculator.'],['🎯','Savings goals','Emergency fund and goals with a monthly progress bar.'],['💳','Debts and loans','Installment simulator and snowball / avalanche strategy.'],['📈','Monthly history','Yearly chart of net, expenses and savings comparing months.'],['📊','Export to Excel (.xlsx)','Direct export and import of your budget sheet.'],['🔔','Payment reminders','Calendar file (.ics) with your paydays, bonuses and holidays.'],['💱','RD$ ↔ USD converter','With the daily rate for salaries or goals in dollars.'],['📱','Installable app (PWA)','Works offline and installs on your phone.']]
-      }
+        changelog:['Removed “Ideas” from the footer.','Custom icons on tabs, buttons and tools (the day/night button stays as is).','“Statutory deduction applied” on the left, with AFP, ARS and ISR options in a dropdown.','New tools: overtime and surcharges, RD$ ↔ USD converter, savings goals, debts and loans, and monthly history.','Example now uses generic data (medicines, top-ups).']
+              }
     };
 
-    // ===== FERIADOS (fuente: Ministerio de Trabajo / Ley 139-97) =====
+        // ===== TEXTOS DE LAS HERRAMIENTAS NUEVAS =====
+    Object.assign(T.es, {
+      navTiempo:'Tiempo laborando', navVac:'Vacaciones', navDs:'Doble sueldo', navTss:'AFP / ARS', navExtras:'Horas extras', navFx:'Conversor USD', navMetas:'Metas de ahorro', navDeudas:'Deudas', navHist:'Historial mensual', navCes:'Cesantía',
+      dedOptions:'Opciones de descuento: AFP, ARS e ISR',
+      titleExtras:'Horas Extras y Recargos', labelExSalario:'Salario mensual (RD$)', labelExHora:'Valor de la hora ordinaria',
+      exH135:'Horas extra al 135 % (hasta 68 h semanales)', exH200:'Horas extra al 200 % (más de 68 h semanales)', exNight:'Horas nocturnas (recargo 15 %)', exHol:'Horas en feriado o descanso (recargo 100 %)',
+      resEx135:'Pago de horas extra al 135 %', resEx200:'Pago de horas extra al 200 %', resExNight:'Recargo nocturno (15 %)', resExHol:'Recargo feriado / descanso (100 %)', resExTotal:'Total adicional bruto', resExNet:'Total adicional neto estimado',
+      notaExtras:'Valor de la hora = salario mensual ÷ 23.83 ÷ 8. Las horas extra se pagan con 35 % de recargo (135 %) hasta 68 horas semanales y con 100 % de recargo (200 %) por encima. En las horas nocturnas, feriados y descansos se calcula solo el recargo, porque la hora base ya está incluida en tu salario. El neto descuenta el AFP/ARS configurado. Confirma tu caso con el Ministerio de Trabajo.',
+      titleFx:'Conversor RD$ ↔ USD', labelFxRate:'Tasa (RD$ por 1 USD)', labelFxRd:'Monto en RD$', labelFxUsd:'Monto en USD', btnFxFetch:'Obtener tasa del día',
+      fxFetching:'Consultando la tasa…', fxOk:(r, d)=>'Tasa de mercado referencial: 1 USD = RD$' + r + ' (' + d + ')', fxFail:'No se pudo obtener la tasa automáticamente. Ingrésala a mano.', fxNeedRate:'Ingresa la tasa del día para convertir.',
+      resFxNet:'Tu sueldo neto mensual en USD', resFxGross:'Tu sueldo bruto mensual en USD', resFxK:'RD$1,000 equivalen a',
+      notaFx:'La tasa automática es de mercado y solo referencial: bancos y casas de cambio aplican su propia tasa de compra y de venta. Puedes escribir la tasa que te den.',
+      titleMetas:'Metas de Ahorro', labelEfMonths:'Meses de gastos para el fondo de emergencia', btnCreateEf:'Crear meta de fondo de emergencia',
+      resEfExpenses:'Gastos mensuales (de tu presupuesto)', resEfTarget:'Fondo de emergencia sugerido', resEfSaving:'Ahorro mensual actual (de tu presupuesto)',
+      subGoals:'Mis metas', efGoalName:'Fondo de emergencia', btnAddGoal:'Agregar meta', goalsEmpty:'Aún no tienes metas. Agrega una o crea tu fondo de emergencia.',
+      gName:'Meta', gTarget:'Monto objetivo (RD$)', gSaved:'Ahorrado (RD$)', gMonthly:'Aporte mensual (RD$)', removeGoal:'Eliminar meta', goalDone:'¡Meta alcanzada!',
+      goalMeta:(rem, n, date)=>'Faltan ' + rem + (n !== null ? ' · ' + (n + (n === 1 ? ' mes' : ' meses')) + ' (aprox. ' + date + ')' : ' · define un aporte mensual para estimar la fecha'),
+      notaMetas:'La estimación supone aportes mensuales constantes y no incluye intereses. El fondo de emergencia se calcula con los gastos reales de tu presupuesto (sin ahorro).',
+      titleDeudas:'Deudas y Préstamos', subLoan:'Simulador de cuotas', labelLoanAmt:'Monto del préstamo (RD$)', labelLoanRate:'Tasa de interés anual (%)', labelLoanMonths:'Plazo (meses)',
+      resLoanPmt:'Cuota mensual', resLoanInt:'Total de intereses', resLoanTotal:'Total a pagar', amortTitle:'Ver tabla de amortización',
+      thMes:'Mes', thCuota:'Cuota', thInteres:'Interés', thCapital:'Capital', thSaldo:'Saldo',
+      subPayoff:'Estrategia: bola de nieve vs. avalancha', dName:'Deuda', dBalance:'Saldo (RD$)', dRate:'Tasa anual (%)', dMin:'Pago mínimo (RD$)', btnAddDebt:'Agregar deuda', debtsEmpty:'Agrega tus deudas para comparar las dos estrategias.', removeDebt:'Eliminar deuda',
+      labelDebtBudget:'Pago mensual total para deudas (RD$)', stratSnow:'Bola de nieve (menor saldo primero)', stratAval:'Avalancha (mayor tasa primero)',
+      stratSnowShort:'La bola de nieve', stratAvalShort:'La avalancha', resMonths:'Tiempo para salir de deudas', resInterest:'Intereses totales', resOrder:'Orden en que se liquidan',
+      stratBetter:(n, s)=>n + ' paga menos intereses: te ahorra ' + s + '.', stratSame:'Ambas estrategias cuestan lo mismo en este caso.',
+      debtLowBudget:'El pago mensual es menor que la suma de los pagos mínimos; se usan los mínimos.', debtNever:'Con estos pagos las deudas no se liquidan en 50 años.',
+      notaDeudas:'Cada mes se suman los intereses, se pagan los mínimos y el resto del pago total va a la deuda prioritaria. Al liquidar una deuda, su pago pasa a la siguiente. La bola de nieve motiva por resultados rápidos; la avalancha suele costar menos intereses.',
+      titleHist:'Historial Mensual', labelHistYear:'Año', labelHistMonth:'Mes a guardar', btnSaveMonth:'Guardar este mes desde la calculadora', monthSaved:'Mes guardado en el historial.',
+      histTotalNet:'Neto acumulado', histTotalExp:'Gastos acumulados (sin ahorro)', histTotalSav:'Ahorro acumulado', histRate:'Tasa de ahorro sobre el neto', histMonthsData:'Meses con datos',
+      histNoData:'Sin datos de este año. Guarda un mes desde la calculadora o escribe los montos en la tabla.',
+      notaHist:'Cada mes guarda tu neto, tus gastos (sin ahorro) y tu ahorro tomados de la pestaña Sueldo y Presupuesto. También puedes escribir o corregir los montos directamente en la tabla.'
+    });
+    Object.assign(T.en, {
+      navTiempo:'Time worked', navVac:'Vacation', navDs:'Double salary', navTss:'AFP / ARS', navExtras:'Overtime', navFx:'USD converter', navMetas:'Savings goals', navDeudas:'Debts', navHist:'Monthly history', navCes:'Severance',
+      dedOptions:'Deduction options: AFP, ARS and ISR',
+      titleExtras:'Overtime and Surcharges', labelExSalario:'Monthly salary (RD$)', labelExHora:'Ordinary hourly rate',
+      exH135:'Overtime hours at 135% (up to 68 h/week)', exH200:'Overtime hours at 200% (over 68 h/week)', exNight:'Night hours (15% surcharge)', exHol:'Holiday or rest-day hours (100% surcharge)',
+      resEx135:'Overtime pay at 135%', resEx200:'Overtime pay at 200%', resExNight:'Night surcharge (15%)', resExHol:'Holiday / rest-day surcharge (100%)', resExTotal:'Total additional gross', resExNet:'Estimated additional net',
+      notaExtras:'Hourly rate = monthly salary ÷ 23.83 ÷ 8. Overtime is paid with a 35% surcharge (135%) up to 68 hours per week and with a 100% surcharge (200%) above that. For night, holiday and rest-day hours only the surcharge is calculated, since the base hour is already in your salary. Net deducts the configured AFP/ARS. Confirm your case with the Ministry of Labor.',
+      titleFx:'RD$ ↔ USD Converter', labelFxRate:'Rate (RD$ per 1 USD)', labelFxRd:'Amount in RD$', labelFxUsd:'Amount in USD', btnFxFetch:'Get today\'s rate',
+      fxFetching:'Fetching the rate…', fxOk:(r, d)=>'Reference market rate: 1 USD = RD$' + r + ' (' + d + ')', fxFail:'Could not fetch the rate automatically. Enter it manually.', fxNeedRate:'Enter today\'s rate to convert.',
+      resFxNet:'Your monthly net salary in USD', resFxGross:'Your monthly gross salary in USD', resFxK:'RD$1,000 equals',
+      notaFx:'The automatic rate is a market reference only: banks and exchange houses apply their own buy and sell rates. You can type the rate you are quoted.',
+      titleMetas:'Savings Goals', labelEfMonths:'Months of expenses for the emergency fund', btnCreateEf:'Create emergency fund goal',
+      resEfExpenses:'Monthly expenses (from your budget)', resEfTarget:'Suggested emergency fund', resEfSaving:'Current monthly savings (from your budget)',
+      subGoals:'My goals', efGoalName:'Emergency fund', btnAddGoal:'Add goal', goalsEmpty:'You have no goals yet. Add one or create your emergency fund.',
+      gName:'Goal', gTarget:'Target amount (RD$)', gSaved:'Saved so far (RD$)', gMonthly:'Monthly contribution (RD$)', removeGoal:'Remove goal', goalDone:'Goal reached!',
+      goalMeta:(rem, n, date)=>rem + ' to go' + (n !== null ? ' · ' + (n + (n === 1 ? ' month' : ' months')) + ' (approx. ' + date + ')' : ' · set a monthly contribution to estimate the date'),
+      notaMetas:'The estimate assumes constant monthly contributions and no interest. The emergency fund uses the real expenses of your budget (excluding savings).',
+      titleDeudas:'Debts and Loans', subLoan:'Installment simulator', labelLoanAmt:'Loan amount (RD$)', labelLoanRate:'Annual interest rate (%)', labelLoanMonths:'Term (months)',
+      resLoanPmt:'Monthly installment', resLoanInt:'Total interest', resLoanTotal:'Total to pay', amortTitle:'View amortization table',
+      thMes:'Month', thCuota:'Payment', thInteres:'Interest', thCapital:'Principal', thSaldo:'Balance',
+      subPayoff:'Strategy: snowball vs. avalanche', dName:'Debt', dBalance:'Balance (RD$)', dRate:'Annual rate (%)', dMin:'Minimum payment (RD$)', btnAddDebt:'Add debt', debtsEmpty:'Add your debts to compare both strategies.', removeDebt:'Remove debt',
+      labelDebtBudget:'Total monthly payment for debts (RD$)', stratSnow:'Snowball (smallest balance first)', stratAval:'Avalanche (highest rate first)',
+      stratSnowShort:'Snowball', stratAvalShort:'Avalanche', resMonths:'Time to be debt-free', resInterest:'Total interest', resOrder:'Payoff order',
+      stratBetter:(n, s)=>n + ' pays less interest: it saves you ' + s + '.', stratSame:'Both strategies cost the same in this case.',
+      debtLowBudget:'The monthly payment is lower than the sum of minimum payments; the minimums are used.', debtNever:'With these payments the debts are not paid off within 50 years.',
+      notaDeudas:'Each month interest is added, minimums are paid and the rest of the total payment goes to the priority debt. When a debt is paid off, its payment rolls to the next one. Snowball motivates with quick wins; avalanche usually costs less interest.',
+      titleHist:'Monthly History', labelHistYear:'Year', labelHistMonth:'Month to save', btnSaveMonth:'Save this month from the calculator', monthSaved:'Month saved to the history.',
+      histTotalNet:'Accumulated net', histTotalExp:'Accumulated expenses (excl. savings)', histTotalSav:'Accumulated savings', histRate:'Savings rate over net', histMonthsData:'Months with data',
+      histNoData:'No data for this year. Save a month from the calculator or type the amounts in the table.',
+      notaHist:'Each month stores your net pay, expenses (excluding savings) and savings taken from the Salary & Budget tab. You can also type or correct amounts directly in the table.'
+    });
+
+// ===== FERIADOS (fuente: Ministerio de Trabajo / Ley 139-97) =====
     // [fecha efectiva, clave, fecha original si fue trasladado]
     const HOL = {
       2026: [['2026-01-01','ny'],['2026-01-05','reyes','2026-01-06'],['2026-01-21','alta'],['2026-01-26','duarte'],['2026-02-27','indep'],['2026-04-03','viernes'],['2026-05-04','trabajo','2026-05-01'],['2026-06-04','corpus'],['2026-08-16','resta'],['2026-09-24','mercedes'],['2026-11-09','const','2026-11-06'],['2026-12-25','navidad']],
@@ -738,8 +1020,9 @@
       salarioBruto:0, frecuencia:'quincenal', bonoDia:15, bonoMonto:0,
       useAfp:true, afpPct:2.87, useArs:true, arsPct:3.04, useIsr:true, isrYear:2026,
       periods:[], readonly:false, history:[],
-      tools:{ fechaIngreso:'', fechaSalida:'', vacFechaIngreso:'', vacFechaSalida:'', vacSalario:'', dsSalario:'', dsMeses:'12', tssSalario:'', tssFreq:'quincenal' },
-      touched:{}
+      tools:{ fechaIngreso:'', fechaSalida:'', vacFechaIngreso:'', vacFechaSalida:'', vacSalario:'', dsSalario:'', dsMeses:'12', tssSalario:'', tssFreq:'quincenal', exSalario:'', exH135:'', exH200:'', exNight:'', exHol:'', fxRate:'', fxRd:'', fxUsd:'', efMonths:'6', loanAmt:'', loanRate:'', loanMonths:'', debtBudget:'' },
+      touched:{}, goals:[], debts:[], monthly:{},
+      ui:{ tool:'tiempo', histYear:new Date().getFullYear(), histMonth:new Date().getMonth(), fxLast:'rd' }
     });
     let state = DEFAULT_STATE();
     let currentLang = 'es';
@@ -756,7 +1039,10 @@
         const p = JSON.parse(raw);
         const base = DEFAULT_STATE();
         state = Object.assign(base, p);
-        state.tools = Object.assign(base.tools, p.tools || {});
+        state.tools = Object.assign(DEFAULT_STATE().tools, p.tools || {});
+        state.ui = Object.assign(DEFAULT_STATE().ui, p.ui || {});
+        ['goals', 'debts'].forEach(k => { if (!Array.isArray(state[k])) state[k] = []; });
+        if (!state.monthly || typeof state.monthly !== 'object') state.monthly = {};
         state.touched = p.touched || {};
         if (!Array.isArray(state.history)) state.history = [];
         const n = NPER[state.frecuencia] || 2;
@@ -842,7 +1128,7 @@
     // ============ ACTUALIZACIÓN ============
     function updateAll() {
       saveState();
-      const steps = [updateDeductNote, updateResults, renderChart, renderBars, renderComparison, renderHistory];
+      const steps = [updateDeductNote, updateResults, renderChart, renderBars, renderComparison, renderHistory, calcEf, calcFx, calcExtras];
       steps.forEach(fn => { try { fn(); } catch(e) { console.error(fn.name, e); } });
     }
 
@@ -1068,7 +1354,7 @@
       renderExpenses(); saveState();
     }
     function updateReadonlyButton() {
-      $('btnReadonly').innerHTML = (state.readonly ? '🔓 ' : '🔒 ') + '<span>' + t(state.readonly ? 'btnReadonlyOn' : 'btnReadonlyOff') + '</span>';
+      $('btnReadonly').innerHTML = ic(state.readonly ? 'unlock' : 'lock') + ' <span>' + t(state.readonly ? 'btnReadonlyOn' : 'btnReadonlyOff') + '</span>';
     }
     function pushStateToInputs() {
       $('salarioBruto').value = state.salarioBruto || '';
@@ -1085,8 +1371,8 @@
       state.useAfp = state.useArs = state.useIsr = true;
       const m = (k, v, n) => mkExp(k, v, n);
       state.periods = [
-        { expenses:[m('pasaje',1800), m('motor',350), m(null,500,'Mami'), m('comida',3500), m('barberia',1050), m('renta',2000), m('ahorro',3000), m('ahorro2',2100), m('streaming',1193.36), m('recarga',150)] },
-        { expenses:[m('pasaje',1800), m('motor',350), m(null,500,'Mami'), m('comida',3500), m('barberia',1050), m('renta',2000), m('ahorro',3000), m('ahorro2',900), m('internet',1500), m('recarga',150)] }
+        { expenses:[m('pasaje',1800), m('motor',350), m('medicinas',500), m('comida',3500), m('barberia',1050), m('renta',2000), m('ahorro',3000), m('ahorro2',2100), m('streaming',1193.36), m('recarga',150)] },
+        { expenses:[m('pasaje',1800), m('motor',350), m('medicinas',500), m('comida',3500), m('barberia',1050), m('renta',2000), m('ahorro',3000), m('ahorro2',900), m('internet',1500), m('recarga',150)] }
       ];
       state.touched = {};
       syncToolsFromMain(true);
@@ -1098,7 +1384,7 @@
       const keep = { lang:state.lang, theme:state.theme };
       state = Object.assign(DEFAULT_STATE(), keep);
       state.periods = defaultPeriods(state.frecuencia);
-      pushStateToInputs(); renderExpenses(); updateAll(); recalcTools();
+      pushStateToInputs(); renderExpenses(); updateAll(); recalcTools(); renderGoals(); renderDebts(); renderHist(); showTool('tiempo', true);
     }
     function exportCSV() {
       const rows = [[t('csvPeriodo'), t('csvGasto'), t('csvMonto')]];
@@ -1173,7 +1459,7 @@
         '<tr><td>' + t('tssRowEmpSfs') + '</td><td class="num">' + fmtNum(empSfs * 12 / ppx) + '</td><td class="num">' + fmtNum(empSfs) + '</td><td class="num">' + fmtNum(empSfs * 12) + '</td></tr></tbody>';
       $('tssNote').textContent = t('tssNote', { afp:pct(ap), ars:pct(rp), capAfp:fmt(CAP.afp), capSfs:fmt(CAP.sfs) });
     }
-    function recalcTools() { [calcularTiempo, calcularVacaciones, calcularDobleSueldo, calcularTss].forEach(fn => { try { fn(); } catch(e) { console.error(fn.name, e); } }); }
+    function recalcTools() { [calcularTiempo, calcularVacaciones, calcularDobleSueldo, calcularTss, calcExtras, calcFx, calcEf, calcLoan, calcDebts, refreshGoalOutputs, updateFxStatus].forEach(fn => { try { fn(); } catch(e) { console.error(fn.name, e); } }); }
 
     // Sincronización: los campos de herramientas se autocompletan desde otros campos
     // mientras el usuario no los haya editado a mano.
@@ -1181,12 +1467,12 @@
     function syncToolsFromMain(force) {
       const m = monthlyGross();
       const val = m > 0 ? String(Math.round(m * 100) / 100) : '';
-      [['vacSalario', val], ['dsSalario', val], ['tssSalario', (Number(state.salarioBruto) || 0) > 0 ? String(state.salarioBruto) : ''], ['tssFreq', state.frecuencia]].forEach(([id, v]) => {
+      [['vacSalario', val], ['dsSalario', val], ['exSalario', val], ['tssSalario', (Number(state.salarioBruto) || 0) > 0 ? String(state.salarioBruto) : ''], ['tssFreq', state.frecuencia]].forEach(([id, v]) => {
         if (force || !state.touched[id]) { $(id).value = v; state.tools[id] = v; }
       });
     }
     function bindTools() {
-      const tools = ['fechaIngreso','fechaSalida','vacFechaIngreso','vacFechaSalida','vacSalario','dsSalario','dsMeses','tssSalario','tssFreq'];
+      const tools = ['fechaIngreso','fechaSalida','vacFechaIngreso','vacFechaSalida','vacSalario','dsSalario','dsMeses','tssSalario','tssFreq','exSalario','exH135','exH200','exNight','exHol','fxRate','efMonths','loanAmt','loanRate','loanMonths','debtBudget'];
       tools.forEach(id => {
         const el = $(id);
         const handler = () => {
@@ -1199,6 +1485,285 @@
         };
         el.addEventListener('input', handler); el.addEventListener('change', handler);
       });
+    }
+
+    // ============ NUEVAS HERRAMIENTAS ============
+    const ic = n => '<svg class="ic" aria-hidden="true"><use href="#ic-' + n + '"/></svg>';
+    const num0 = id => parseFloat($(id).value) || 0;
+    const monthName = (i, style) => new Date(2000, i, 1).toLocaleDateString(locale(), { month:style || 'long' });
+
+    function showTool(id, noSave) {
+      state.ui.tool = id;
+      document.querySelectorAll('.tool-card').forEach(c => c.classList.toggle('active', c.dataset.tool === id));
+      document.querySelectorAll('.tool-btn').forEach(b => b.classList.toggle('active', b.dataset.tool === id));
+      if (id === 'fx' && !$('fxRate').value && !fxTried) fetchRate();
+      if (!noSave) saveState();
+    }
+
+    // ---------- Horas extras y recargos ----------
+    function calcExtras() {
+      const sal = num0('exSalario'), h = sal / WORKDAYS / 8;
+      const hrs = id => Math.max(0, num0(id));
+      const v135 = hrs('exH135') * h * 1.35, v200 = hrs('exH200') * h * 2, vN = hrs('exNight') * h * 0.15, vH = hrs('exHol') * h;
+      const tot = v135 + v200 + vN + vH;
+      const ded = ((state.useAfp ? +state.afpPct || 0 : 0) + (state.useArs ? +state.arsPct || 0 : 0)) / 100;
+      setTxt('exHora', sal > 0 ? fmt(h) : '—');
+      setTxt('resEx135', fmt(v135)); setTxt('resEx200', fmt(v200)); setTxt('resExNight', fmt(vN)); setTxt('resExHol', fmt(vH));
+      setTxt('resExTotal', fmt(tot)); setTxt('resExNet', fmt(tot * (1 - ded)));
+    }
+
+    // ---------- Conversor RD$ <-> USD ----------
+    let fxTried = false, fxMeta = null;
+    function fxRate() { return parseFloat($('fxRate').value) || 0; }
+    function fxConvert() {
+      const rate = fxRate();
+      if (!rate) return;
+      if (state.ui.fxLast === 'usd') { const u = $('fxUsd').value; if (u !== '') { $('fxRd').value = (Math.round(parseFloat(u) * rate * 100) / 100); state.tools.fxRd = $('fxRd').value; } }
+      else { const r = $('fxRd').value; if (r !== '') { $('fxUsd').value = (Math.round(parseFloat(r) / rate * 100) / 100); state.tools.fxUsd = $('fxUsd').value; } }
+    }
+    function calcFx() {
+      fxConvert();
+      const rate = fxRate();
+      const usd = v => 'US$' + (v).toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+      if (!rate) { ['resFxNet','resFxGross','resFxK'].forEach(id => setTxt(id, '—')); return; }
+      const net = calcAll().neto, gross = monthlyGross();
+      setTxt('resFxNet', net > 0 ? usd(net / rate) : '—');
+      setTxt('resFxGross', gross > 0 ? usd(gross / rate) : '—');
+      setTxt('resFxK', usd(1000 / rate));
+    }
+    function updateFxStatus() {
+      const el = $('fxStatus');
+      if (fxMeta && fxMeta.busy) el.textContent = t('fxFetching');
+      else if (fxMeta && fxMeta.ok) el.textContent = t('fxOk', fxRate().toFixed(2), fxMeta.date);
+      else if (fxMeta && fxMeta.ok === false) el.textContent = t('fxFail');
+      else el.textContent = fxRate() ? '' : t('fxNeedRate');
+    }
+    async function fetchRate() {
+      fxTried = true; fxMeta = { busy:true }; updateFxStatus();
+      try {
+        const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
+        const res = await fetch('https://open.er-api.com/v6/latest/USD', { signal:ctl.signal });
+        clearTimeout(to);
+        const j = await res.json(), v = j && j.rates && j.rates.DOP;
+        if (!v) throw new Error('no rate');
+        $('fxRate').value = (Math.round(v * 100) / 100).toFixed(2);
+        state.tools.fxRate = $('fxRate').value;
+        fxMeta = { ok:true, date:new Date().toLocaleDateString(locale()) };
+        saveState(); calcFx();
+      } catch (e) { fxMeta = { ok:false }; }
+      updateFxStatus();
+    }
+
+    // ---------- Metas de ahorro ----------
+    function calcEf() {
+      const r = calcAll(), m = Math.max(0, num0('efMonths'));
+      setTxt('resEfExpenses', fmt(r.gastosReales)); setTxt('resEfTarget', fmt(r.gastosReales * m)); setTxt('resEfSaving', fmt(r.ahorro));
+    }
+    function renderGoals() {
+      const box = $('goalsList');
+      if (!state.goals.length) { box.innerHTML = '<div class="empty-state">' + t('goalsEmpty') + '</div>'; return; }
+      const fld = (g, f, label, type, step) => '<div class="form-group"><label>' + label + '</label><input type="' + type + '" data-f="' + f + '"' + (type === 'number' ? ' min="0" step="' + step + '" value="' + (g[f] || '') + '"' : ' value="' + esc(g[f]) + '"') + '></div>';
+      box.innerHTML = state.goals.map(g =>
+        '<div class="goal-row" data-id="' + g.id + '"><div class="row-fields goal-fields">' +
+        fld(g, 'name', t('gName'), 'text') + fld(g, 'target', t('gTarget'), 'number', '0.01') + fld(g, 'saved', t('gSaved'), 'number', '0.01') + fld(g, 'monthly', t('gMonthly'), 'number', '0.01') +
+        '<button type="button" class="icon-btn" data-del title="' + t('removeGoal') + '">' + ic('trash') + '</button></div>' +
+        '<div class="progress"><div class="progress-fill" data-gout="bar"></div></div>' +
+        '<div class="goal-meta"><span data-gout="meta"></span><strong data-gout="pct"></strong></div></div>').join('');
+      refreshGoalOutputs();
+    }
+    function refreshGoalOutputs() {
+      state.goals.forEach(g => {
+        const row = document.querySelector('.goal-row[data-id="' + g.id + '"]'); if (!row) return;
+        const tg = +g.target || 0, sv = +g.saved || 0, mo = +g.monthly || 0;
+        const p = tg > 0 ? Math.min(100, sv / tg * 100) : 0, rem = Math.max(0, tg - sv);
+        row.querySelector('[data-gout="bar"]').style.width = p.toFixed(1) + '%';
+        row.querySelector('[data-gout="bar"]').classList.toggle('done', tg > 0 && rem <= 0);
+        row.querySelector('[data-gout="pct"]').textContent = p.toFixed(0) + '%';
+        let meta;
+        if (tg > 0 && rem <= 0) meta = t('goalDone');
+        else {
+          const n = mo > 0 ? Math.ceil(rem / mo) : null; let d = '';
+          if (n !== null) { const a = addMonths(todayObj(), n); d = new Date(a.y, a.m - 1, 1).toLocaleDateString(locale(), { month:'long', year:'numeric' }); }
+          meta = t('goalMeta', fmt(rem), n, d);
+        }
+        row.querySelector('[data-gout="meta"]').textContent = meta;
+      });
+    }
+
+    // ---------- Deudas y préstamos ----------
+    function calcLoan() {
+      const P = num0('loanAmt'), rate = num0('loanRate'), n = Math.round(num0('loanMonths'));
+      const tbl = $('amortTable');
+      if (P <= 0 || n <= 0) { ['resLoanPmt','resLoanInt','resLoanTotal'].forEach(id => setTxt(id, '—')); tbl.innerHTML = ''; return; }
+      const r = rate / 1200;
+      const pmt = r === 0 ? P / n : P * r / (1 - Math.pow(1 + r, -n));
+      setTxt('resLoanPmt', fmt(pmt)); setTxt('resLoanInt', fmt(pmt * n - P)); setTxt('resLoanTotal', fmt(pmt * n));
+      let bal = P, html = '<thead><tr><th>' + t('thMes') + '</th><th>' + t('thCuota') + '</th><th>' + t('thInteres') + '</th><th>' + t('thCapital') + '</th><th>' + t('thSaldo') + '</th></tr></thead><tbody>';
+      for (let i = 1; i <= Math.min(n, 600); i++) {
+        const it = bal * r, cap = pmt - it; bal = Math.max(0, bal - cap);
+        html += '<tr><td>' + i + '</td><td class="num">' + fmtNum(pmt) + '</td><td class="num">' + fmtNum(it) + '</td><td class="num">' + fmtNum(cap) + '</td><td class="num">' + fmtNum(i === n ? 0 : bal) + '</td></tr>';
+      }
+      tbl.innerHTML = html + '</tbody>';
+    }
+    function renderDebts() {
+      const box = $('debtList');
+      if (!state.debts.length) { box.innerHTML = '<div class="empty-state">' + t('debtsEmpty') + '</div>'; return; }
+      const fld = (d, f, label, type) => '<div class="form-group"><label>' + label + '</label><input type="' + type + '" data-f="' + f + '"' + (type === 'number' ? ' min="0" step="0.01" value="' + (d[f] || '') + '"' : ' value="' + esc(d[f]) + '"') + '></div>';
+      box.innerHTML = state.debts.map(d =>
+        '<div class="debt-row" data-id="' + d.id + '"><div class="row-fields debt-fields">' +
+        fld(d, 'name', t('dName'), 'text') + fld(d, 'balance', t('dBalance'), 'number') + fld(d, 'rate', t('dRate'), 'number') + fld(d, 'min', t('dMin'), 'number') +
+        '<button type="button" class="icon-btn" data-del title="' + t('removeDebt') + '">' + ic('trash') + '</button></div></div>').join('');
+    }
+    function simulatePayoff(debts, budget, mode) {
+      const ds = debts.map(d => ({ name:d.name, bal:+d.balance || 0, rate:+d.rate || 0, min:+d.min || 0, done:false })).filter(d => d.bal > 0);
+      let months = 0, interest = 0; const order = [];
+      const settle = d => { if (d.bal <= 0.005 && !d.done) { d.done = true; d.bal = 0; order.push(d.name); } };
+      while (ds.some(d => !d.done) && months < 600) {
+        months++;
+        ds.forEach(d => { if (!d.done) { const i = d.bal * d.rate / 1200; d.bal += i; interest += i; } });
+        let avail = budget;
+        ds.forEach(d => { if (!d.done) { const p = Math.min(d.min, d.bal); d.bal -= p; avail -= p; settle(d); } });
+        const targets = ds.filter(d => !d.done).sort(mode === 'snow' ? (a, b) => a.bal - b.bal : (a, b) => b.rate - a.rate);
+        for (const d of targets) { if (avail <= 0.005) break; const p = Math.min(avail, d.bal); d.bal -= p; avail -= p; settle(d); }
+      }
+      return { months, interest, ok:!ds.some(d => !d.done), order };
+    }
+    function calcDebts() {
+      const box = $('debtResult');
+      const debts = state.debts.filter(d => (+d.balance || 0) > 0);
+      if (!debts.length) { box.innerHTML = ''; return; }
+      const sumMin = debts.reduce((s, d) => s + (+d.min || 0), 0);
+      let budget = num0('debtBudget'), warn = '';
+      if (budget < sumMin) { if (budget > 0 || sumMin > 0) warn = '<div class="info-note">' + t('debtLowBudget') + '</div>'; budget = sumMin; }
+      const nm = (d, i) => d.name || (t('dName') + ' ' + (i + 1));
+      const named = debts.map((d, i) => Object.assign({}, d, { name:nm(d, i) }));
+      const S = simulatePayoff(named, budget, 'snow'), A = simulatePayoff(named, budget, 'aval');
+      const col = (title, r) => '<div class="strat-card"><h4>' + title + '</h4>' + (r.ok ?
+        row(t('resMonths'), t('monthS', r.months)) + row(t('resInterest'), fmt(r.interest), 'negative') + '<div class="strat-order"><span class="label">' + t('resOrder') + '</span><ol>' + r.order.map(n => '<li>' + esc(n) + '</li>').join('') + '</ol></div>'
+        : '<div class="empty-state">' + t('debtNever') + '</div>') + '</div>';
+      let verdict = '';
+      if (S.ok && A.ok) {
+        const diff = S.interest - A.interest;
+        verdict = Math.abs(diff) < 0.5 ? '<div class="info-note">' + t('stratSame') + '</div>'
+          : '<div class="info-note">' + t('stratBetter', diff > 0 ? t('stratAvalShort') : t('stratSnowShort'), fmt(Math.abs(diff))) + '</div>';
+      }
+      box.innerHTML = warn + '<div class="grid-2">' + col(t('stratSnow'), S) + col(t('stratAval'), A) + '</div>' + verdict;
+    }
+
+    // ---------- Historial mensual ----------
+    const mkey = (y, i) => y + '-' + String(i + 1).padStart(2, '0');
+    function buildHistSelectors() {
+      const cy = new Date().getFullYear();
+      $('histYear').innerHTML = [cy - 2, cy - 1, cy, cy + 1].map(y => '<option value="' + y + '">' + y + '</option>').join('');
+      $('histYear').value = state.ui.histYear;
+      $('histMonth').innerHTML = Array.from({ length:12 }, (_, i) => '<option value="' + i + '">' + monthName(i) + '</option>').join('');
+      $('histMonth').value = state.ui.histMonth;
+    }
+    function niceMax(v) { const p = Math.pow(10, Math.floor(Math.log10(v))), f = v / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
+    function shortNum(n) { return n >= 1000 ? (n / 1000).toFixed(n % 1000 ? 1 : 0).replace(/\.0$/, '') + 'k' : String(Math.round(n)); }
+    const HIST_SERIES = [['n', 'colNeto', 'var(--accent)'], ['g', 'chartGastos', 'var(--color-gasto)'], ['a', 'chartAhorro', 'var(--color-ahorro)']];
+    function renderHistTable() {
+      const y = state.ui.histYear;
+      let html = '<thead><tr><th>' + t('thMes') + '</th><th>' + t('colNeto') + '</th><th>' + t('chartGastos') + '</th><th>' + t('chartAhorro') + '</th></tr></thead><tbody>';
+      for (let i = 0; i < 12; i++) {
+        const d = state.monthly[mkey(y, i)] || {};
+        html += '<tr><td style="text-transform:capitalize">' + monthName(i) + '</td>' + HIST_SERIES.map(([f]) => '<td><input class="inline-input" type="number" min="0" step="0.01" data-m="' + mkey(y, i) + '" data-f="' + f + '" value="' + (d[f] === undefined ? '' : d[f]) + '"></td>').join('') + '</tr>';
+      }
+      $('histTable').innerHTML = html + '</tbody>';
+    }
+    function renderHistChart() {
+      const y = state.ui.histYear;
+      const data = Array.from({ length:12 }, (_, i) => state.monthly[mkey(y, i)] || {});
+      const all = data.flatMap(d => [d.n || 0, d.g || 0, d.a || 0]);
+      const has = all.some(v => v > 0);
+      $('histLegend').innerHTML = HIST_SERIES.map(([, k, c]) => '<div class="legend-item"><span class="legend-dot" style="background:' + c + '"></span>' + t(k) + '</div>').join('');
+      if (!has) {
+        $('histChartBox').innerHTML = '<div class="empty-state">' + t('histNoData') + '</div>';
+        $('histSummary').innerHTML = ''; return;
+      }
+      const W = 720, H = 270, L = 46, R = 8, T = 12, B = 28, cw = (W - L - R) / 12, bw = cw * 0.22;
+      const top = niceMax(Math.max(...all)), sy = v => T + (H - T - B) * (1 - v / top);
+      let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="hist-svg" role="img">';
+      for (let k = 0; k <= 4; k++) {
+        const v = top / 4 * k, yy = sy(v);
+        svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + yy + '" y2="' + yy + '" stroke="var(--border-color)" stroke-dasharray="' + (k ? '3 3' : '0') + '"/><text x="' + (L - 6) + '" y="' + (yy + 3.5) + '" class="axis-t" text-anchor="end">' + shortNum(v) + '</text>';
+      }
+      data.forEach((d, i) => {
+        const x0 = L + i * cw;
+        svg += '<rect class="hm" data-m="' + i + '" x="' + x0 + '" y="' + T + '" width="' + cw + '" height="' + (H - T - B) + '" fill="transparent"/>';
+        HIST_SERIES.forEach(([f, , c], j) => {
+          const v = d[f] || 0, x = x0 + cw * 0.5 - bw * 1.5 - 2 + j * (bw + 2);
+          if (v > 0) svg += '<rect class="hbar" x="' + x + '" y="' + sy(v) + '" width="' + bw + '" height="' + (H - B - sy(v)) + '" rx="2" fill="' + c + '" pointer-events="none"/>';
+        });
+        svg += '<text x="' + (x0 + cw / 2) + '" y="' + (H - 9) + '" class="axis-t" text-anchor="middle">' + monthName(i, 'short').replace('.', '') + '</text>';
+      });
+      $('histChartBox').innerHTML = svg + '</svg>';
+      const sum = f => data.reduce((s, d) => s + (d[f] || 0), 0), cnt = data.filter(d => d.n || d.g || d.a).length;
+      const rate = sum('n') > 0 ? sum('a') / sum('n') * 100 : 0;
+      $('histSummary').innerHTML = row(t('histTotalNet'), fmt(sum('n')), 'positive') + row(t('histTotalExp'), fmt(sum('g')), 'negative') + row(t('histTotalSav'), fmt(sum('a')), 'positive') +
+        row(t('histRate'), rate.toFixed(1) + '%') + row(t('histMonthsData'), String(cnt));
+    }
+    function renderHist() { buildHistSelectors(); renderHistTable(); renderHistChart(); }
+    function initHistHover() {
+      const box = $('histChartBox'), tip = $('chartTooltip');
+      box.addEventListener('mousemove', e => {
+        const r = e.target.closest('.hm');
+        if (!r) { tip.classList.remove('visible'); return; }
+        const i = +r.dataset.m, d = state.monthly[mkey(state.ui.histYear, i)] || {};
+        tip.innerHTML = '<div style="text-transform:capitalize">' + monthName(i) + ' ' + state.ui.histYear + '</div>' +
+          HIST_SERIES.map(([f, k, c]) => '<div><span class="legend-dot" style="background:' + c + '"></span> ' + t(k) + ': ' + fmt(d[f] || 0) + '</div>').join('');
+        tip.style.left = (e.clientX + 14) + 'px'; tip.style.top = (e.clientY - 20) + 'px'; tip.classList.add('visible');
+      });
+      box.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+    }
+
+    function initNewTools() {
+      $('toolNav').addEventListener('click', e => { const b = e.target.closest('[data-tool]'); if (b) showTool(b.dataset.tool); });
+      // Conversor
+      $('fxRd').addEventListener('input', () => { state.ui.fxLast = 'rd'; state.tools.fxRd = $('fxRd').value; if ($('fxRd').value === '') { $('fxUsd').value = ''; state.tools.fxUsd = ''; } saveState(); calcFx(); });
+      $('fxUsd').addEventListener('input', () => { state.ui.fxLast = 'usd'; state.tools.fxUsd = $('fxUsd').value; if ($('fxUsd').value === '') { $('fxRd').value = ''; state.tools.fxRd = ''; } saveState(); calcFx(); });
+      $('fxRate').addEventListener('input', updateFxStatus);
+      $('btnFxFetch').addEventListener('click', fetchRate);
+      // Metas
+      $('btnAddGoal').addEventListener('click', () => { state.goals.push({ id:uid(), name:'', target:0, saved:0, monthly:0 }); saveState(); renderGoals(); const i = document.querySelectorAll('.goal-row [data-f="name"]'); if (i.length) i[i.length - 1].focus(); });
+      $('btnCreateEf').addEventListener('click', () => {
+        const target = Math.round(calcAll().gastosReales * Math.max(0, num0('efMonths')) * 100) / 100;
+        state.goals.push({ id:uid(), name:t('efGoalName'), target, saved:0, monthly:Math.round(calcAll().ahorro * 100) / 100 });
+        saveState(); renderGoals();
+      });
+      const rowEvents = (boxId, listKey, afterInput, rerender) => {
+        const box = $(boxId);
+        box.addEventListener('input', e => {
+          const rowEl = e.target.closest('[data-id]'); if (!rowEl || !e.target.dataset.f) return;
+          const it = state[listKey].find(x => x.id === rowEl.dataset.id); if (!it) return;
+          it[e.target.dataset.f] = e.target.type === 'number' ? (parseFloat(e.target.value) || 0) : e.target.value;
+          saveState(); afterInput();
+        });
+        box.addEventListener('click', e => {
+          const del = e.target.closest('[data-del]'); if (!del) return;
+          const id = del.closest('[data-id]').dataset.id;
+          state[listKey] = state[listKey].filter(x => x.id !== id); saveState(); rerender(); afterInput();
+        });
+      };
+      rowEvents('goalsList', 'goals', refreshGoalOutputs, renderGoals);
+      rowEvents('debtList', 'debts', calcDebts, renderDebts);
+      $('btnAddDebt').addEventListener('click', () => { state.debts.push({ id:uid(), name:'', balance:0, rate:0, min:0 }); saveState(); renderDebts(); const i = document.querySelectorAll('.debt-row [data-f="name"]'); if (i.length) i[i.length - 1].focus(); });
+      // Historial
+      $('histYear').addEventListener('change', e => { state.ui.histYear = +e.target.value; saveState(); renderHistTable(); renderHistChart(); });
+      $('histMonth').addEventListener('change', e => { state.ui.histMonth = +e.target.value; saveState(); });
+      $('btnSaveMonth').addEventListener('click', () => {
+        const r = calcAll(), k = mkey(state.ui.histYear, state.ui.histMonth), rd = v => Math.round(v * 100) / 100;
+        state.monthly[k] = { n:rd(r.neto), g:rd(r.gastosReales), a:rd(r.ahorro) };
+        saveState(); renderHistTable(); renderHistChart(); alert(t('monthSaved'));
+      });
+      $('histTable').addEventListener('input', e => {
+        const k = e.target.dataset.m, f = e.target.dataset.f; if (!k) return;
+        const cur = Object.assign({}, state.monthly[k]);
+        if (e.target.value === '') delete cur[f]; else cur[f] = parseFloat(e.target.value) || 0;
+        if (Object.keys(cur).length) state.monthly[k] = cur; else delete state.monthly[k];
+        saveState(); renderHistChart();
+      });
+      initHistHover();
     }
 
     // ============ FERIADOS ============
@@ -1214,7 +1779,7 @@
         const isPast = dnum(p) < today;
         let cls = isPast ? 'past' : '';
         let label = '';
-        if (!isPast && !nextFound) { cls = 'next-holiday'; nextFound = true; label = ' ⭐'; }
+        if (!isPast && !nextFound) { cls = 'next-holiday'; nextFound = true; label = ' <span class="next-star">' + ic('star') + '</span>'; }
         const note = orig ? t('noteMoved', fmtD(orig, { day:'numeric', month:'long' })) : ((dow === 0 || dow === 6) ? t('noteWeekend') : t('noteFixed'));
         html += '<tr class="' + cls + '"><td>' + fmtD(date, { day:'numeric', month:'long' }) + '</td><td>' + HOL_NAMES[currentLang][key] + label + '</td><td>' + fmtD(date, { weekday:'long' }) + '</td><td>' + note + '</td></tr>';
       });
@@ -1299,7 +1864,7 @@
       $('subLabel').textContent = tr.subLabel;
       $('versionTag').textContent = 'v' + VERSION;
       actualizarBotonTema(); updateReadonlyButton();
-      renderExpenses(); updateAll(); recalcTools(); renderHolidays();
+      renderExpenses(); updateAll(); recalcTools(); renderHolidays(); renderGoals(); renderDebts(); renderHist(); updateFxStatus();
       if (openModal) abrirModal(openModal);
       if (!silent) saveState();
     }
@@ -1312,9 +1877,6 @@
       else if (tipo === 'about') {
         title = t('modalAboutTitle');
         body = t('modalAbout', VERSION) + '<h3 style="font-size:14px;margin:14px 0 4px;">' + t('changelogTitle') + ' (v' + VERSION + ')</h3><ul>' + T[currentLang].changelog.map(x => '<li>' + x + '</li>').join('') + '</ul>';
-      } else if (tipo === 'ideas') {
-        title = t('modalIdeasTitle');
-        body = '<ul>' + T[currentLang].ideas.map(i => '<li>' + i[0] + ' <strong>' + i[1] + '</strong> — ' + i[2] + '</li>').join('') + '</ul>';
       }
       $('modalContent').innerHTML = '<h2>' + title + '</h2><div class="modal-content">' + body + '</div>';
       $('modalOverlay').classList.add('open');
@@ -1340,7 +1902,7 @@
       [['useAfp','useAfp'],['useArs','useArs'],['useIsr','useIsr']].forEach(([id, key]) => $(id).addEventListener('change', e => { state[key] = e.target.checked; onMainChange(); }));
       $('isrYear').addEventListener('change', e => { state.isrYear = +e.target.value; onMainChange(); });
       $('frecuencia').addEventListener('change', onFrecuenciaChange);
-      bindTools();
+      bindTools(); initNewTools();
 
       // Gastos (delegación)
       const sections = $('expenseSections');
@@ -1370,6 +1932,7 @@
       // Tema: por defecto noche (igual que el simulador CNC)
       actualizarTema(state.theme !== 'light', true);
       setLanguage(currentLang, true);
+      showTool(state.ui.tool || 'tiempo', true);
       // Los campos de fecha se rellenan después de pushStateToInputs; recalcular una vez más por seguridad
       recalcTools();
     }
