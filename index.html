@@ -914,7 +914,7 @@
         modalAboutTitle:'Acerca de',
         modalAbout:(v)=>'<p><strong>Calculadora Laboral y Financiera RD</strong> — v' + v + '</p><p>Herramienta para estimar sueldo neto, presupuesto por período, vacaciones, regalía pascual y tiempo laborado en República Dominicana.</p><p>Desarrollado por <strong>FrancOS</strong> — Mecatrónico. Apasionado por la electrónica, la programación y el control numérico.</p><div class="github-profile">' + GH_SVG + '<a href="https://github.com/SimuladorCNC2D" target="_blank" rel="noopener">github.com/SimuladorCNC2D</a></div><p style="margin-top:10px;">💡 <a href="mailto:francos.dev@outlook.com">Contactar por correo</a> para reportar bugs o sugerencias.</p>',
         changelogTitle:'Novedades',
-        changelog:['Nueva sección «Otras páginas que te podrían interesar», con el simulador CNC.','Logo propio de la página en la pestaña del navegador y en favoritos.','El enlace al calendario oficial de feriados del Ministerio de Trabajo se actualiza según el año que consultas.'],
+        changelog:[["Sueldo y presupuesto", ["Todos los períodos a la vista, con un gráfico interactivo que muestra en qué se va tu dinero.", "Elige pago mensual, quincenal o semanal, y carga un ejemplo adaptado a cada uno.", "Descuentos de ley (AFP, ARS e ISR) que puedes activar o ajustar a tu caso."]], ["Nuevas herramientas", ["Horas extras y recargos.", "Conversor RD$ ↔ USD con la tasa del día.", "Metas de ahorro con barra de progreso.", "Deudas y préstamos: compara estrategias para salir de ellas más rápido.", "Historial mensual con gráfico anual.", "Calculadora de AFP y ARS."]], ["Herramientas laborales", ["Todas en una sola pantalla, con accesos directos para ir a la que necesites.", "Se completan solas con tu salario y tus fechas, y puedes restablecerlas cuando quieras."]], ["Feriados", ["Calendario de 2025, 2026 y 2027, que abre en el año en curso.", "Acceso directo al calendario oficial del Ministerio de Trabajo del año que consultas."]], ["Experiencia", ["Diseño más claro y moderno.", "Modo día/noche y cambio de idioma español/inglés al instante.", "Modo lectura para consultar tus datos sin modificarlos.", "Mejoras de estabilidad y precisión en los cálculos."]], ["Más", ["Nueva sección con otras páginas que te podrían interesar."]]],
               },
       en: {
         title:'Labor & Financial Calculator', titleAccent:'DR',
@@ -994,7 +994,7 @@
         modalAboutTitle:'About',
         modalAbout:(v)=>'<p><strong>Labor &amp; Financial Calculator DR</strong> — v' + v + '</p><p>Tool to estimate net salary, per-period budget, vacation, Christmas bonus and time worked in the Dominican Republic.</p><p>Developed by <strong>FrancOS</strong> — Mechatronics. Passionate about electronics, programming and numerical control.</p><div class="github-profile">' + GH_SVG + '<a href="https://github.com/SimuladorCNC2D" target="_blank" rel="noopener">github.com/SimuladorCNC2D</a></div><p style="margin-top:10px;">💡 <a href="mailto:francos.dev@outlook.com">Contact by email</a> to report bugs or suggestions.</p>',
         changelogTitle:'What\'s new',
-        changelog:['New “Other pages you might like” section, featuring the CNC simulator.','Custom page logo on the browser tab and in bookmarks.','The link to the Ministry of Labor\'s official holiday calendar follows the year you are viewing.']
+        changelog:[["Salary and budget", ["All periods at a glance, with an interactive chart showing where your money goes.", "Choose monthly, fortnightly or weekly pay, and load an example tailored to each.", "Statutory deductions (AFP, ARS and ISR) you can turn on or adjust to your case."]], ["New tools", ["Overtime and surcharges.", "RD$ ↔ USD converter with today's rate.", "Savings goals with a progress bar.", "Debts and loans: compare strategies to become debt-free faster.", "Monthly history with a yearly chart.", "AFP and ARS calculator."]], ["Labor tools", ["All on a single screen, with shortcuts to jump to the one you need.", "They fill in automatically from your salary and dates, and you can reset them whenever you like."]], ["Holidays", ["Calendar for 2025, 2026 and 2027, opening on the current year.", "Direct access to the Ministry of Labor's official calendar for the year you are viewing."]], ["Experience", ["A clearer, more modern design.", "Day/night mode and instant Spanish/English switching.", "Read-only mode to view your data without changing it.", "Stability and calculation accuracy improvements."]], ["More", ["New section with other pages you might like."]]]
               }
     };
 
@@ -2021,7 +2021,7 @@ Object.assign(T.es, { otherTitle:'Otras páginas que te podrían interesar', oth
         body = t('modalAbout', VERSION);
       } else if (tipo === 'changes') {
         title = t('changelogTitle') + ' (v' + VERSION + ')';
-        body = '<ul>' + T[currentLang].changelog.map(x => '<li>' + x + '</li>').join('') + '</ul>';
+        body = T[currentLang].changelog.map(([cat, items]) => '<h3 style="font-size:14px;margin:14px 0 4px;color:var(--accent);">' + cat + '</h3><ul>' + items.map(x => '<li>' + x + '</li>').join('') + '</ul>').join('');
       }
       $('modalContent').innerHTML = '<h2>' + title + '</h2><div class="modal-content">' + body + '</div>';
       $('modalOverlay').classList.add('open');
