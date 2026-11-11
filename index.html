@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pageTitle">Calculadora Laboral y Financiera RD v2.3.4 FrancOS 2.1</title>
+  <title id="pageTitle">Calculadora Laboral y Financiera RD v2.3.6 FrancOS 2.1</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%230f766e%22/%3E%3Cstop offset=%221%22 stop-color=%22%232dd4bf%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22url%28%23g%29%22/%3E%3Crect x=%2215%22 y=%229%22 width=%2234%22 height=%2246%22 rx=%226%22 fill=%22%230f172a%22/%3E%3Crect x=%2220%22 y=%2214%22 width=%2224%22 height=%2212%22 rx=%223%22 fill=%22%235eead4%22/%3E%3Cg fill=%22%23e2e8f0%22%3E%3Ccircle cx=%2224%22 cy=%2235%22 r=%223%22/%3E%3Ccircle cx=%2232%22 cy=%2235%22 r=%223%22/%3E%3Ccircle cx=%2240%22 cy=%2235%22 r=%223%22/%3E%3Ccircle cx=%2224%22 cy=%2244%22 r=%223%22/%3E%3Ccircle cx=%2232%22 cy=%2244%22 r=%223%22/%3E%3C/g%3E%3Crect x=%2237%22 y=%2241%22 width=%226%22 height=%229%22 rx=%223%22 fill=%22%232dd4bf%22/%3E%3C/svg%3E">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -15,7 +15,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Calculadora Laboral y Financiera RD">
   <meta property="og:locale" content="es_DO">
-  <meta property="og:title" content="Calculadora Laboral y Financiera RD v2.3.4">
+  <meta property="og:title" content="Calculadora Laboral y Financiera RD v2.3.6">
   <meta property="og:description" content="Sueldo neto (AFP/ARS/ISR), presupuesto, vacaciones, doble sueldo, horas extras, deudas y feriados de República Dominicana.">
   <meta property="og:url" content="https://simuladorcnc2d.github.io/Calculadora-Laboral-y-Financiera-RD/">
   <meta property="og:image" content="https://simuladorcnc2d.github.io/Calculadora-Laboral-y-Financiera-RD/preview.png">
@@ -24,7 +24,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Calculadora Laboral y Financiera RD con presupuesto, descuentos de ley y gráfico">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Calculadora Laboral y Financiera RD v2.3.4">
+  <meta name="twitter:title" content="Calculadora Laboral y Financiera RD v2.3.6">
   <meta name="twitter:description" content="Sueldo neto, presupuesto, vacaciones, doble sueldo, horas extras, deudas y feriados de República Dominicana.">
   <meta name="twitter:image" content="https://simuladorcnc2d.github.io/Calculadora-Laboral-y-Financiera-RD/preview.png">
   <style>
@@ -771,7 +771,7 @@
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <a href="https://calendar.google.com/calendar/embed?src=es.do%23holiday%40group.v.calendar.google.com&ctz=America%2FSanto_Domingo" target="_blank" rel="noopener" class="btn"><span data-t="btnCalendario">Abrir calendario digital →</span></a>
-            <a href="https://mt.gob.do/ministerio-de-trabajo-informa-dias-feriados-correspondientes-al-ano-2026/" target="_blank" rel="noopener" class="btn" id="btnMinHol"><span data-t="btnMinTrabajo">Abrir calendario oficial →</span></a>
+            <a href="https://mt.gob.do/ministerio-de-trabajo-informa-dias-feriados-correspondientes-al-ano-2026/" target="_blank" rel="noopener" class="btn" id="btnMinHol"><span id="btnMinHolTxt">Abrir calendario oficial →</span></a>
           </div>
         </div>
         <div class="year-switch" id="yearSwitch"></div>
@@ -798,7 +798,7 @@
 
   <footer class="app-footer">
     <div class="footer-left">
-      <button type="button" class="version" id="versionTag" onclick="abrirModal('changes')" title="Novedades">v2.3.4</button>
+      <button type="button" class="version" id="versionTag" onclick="abrirModal('changes')" title="Novedades">v2.3.6</button>
       <span class="status-indicator"><span class="status-dot"></span><span id="statusText" data-t="statusText">Sistemas estables</span></span>
       <span>|</span>
       <a onclick="abrirModal('terms')" data-t="footerTerms">Términos</a>
@@ -829,7 +829,7 @@
     // ===================================================================
     //  CALCULADORA LABORAL Y FINANCIERA RD — FrancOS 2.1
     // ===================================================================
-    const VERSION = '2.3.4';
+    const VERSION = '2.3.6';
     const STORAGE_KEY = 'francos_calc_rd_v5';
     const $ = id => document.getElementById(id);
 
@@ -892,7 +892,7 @@
         textoFeriadosIntro:'Consulta los feriados oficiales. Abre el calendario digital o revisa la lista de referencia de abajo.',
         textoCalendario:'Calendario digital de feriados',
         textoCalendarioDesc:'Calendario de Google con los días festivos de República Dominicana.',
-        btnCalendario:'Abrir calendario digital →', btnMinTrabajo:'Abrir calendario oficial →',
+        btnCalendario:'Abrir calendario digital →', btnMinTrabajo:'Abrir calendario oficial',
         thFecha:'Fecha', thFeriado:'Feriado', thDia:'Día', thNota:'Nota',
         noteMoved:(d)=>'Trasladado desde el ' + d, noteFixed:'Fecha fija', noteWeekend:'Cae en fin de semana (no se mueve)', nextHoliday:'Próximo feriado',
         notaFeriados:'Lista de referencia según la Ley 139-97 y los calendarios publicados por el Ministerio de Trabajo. Confirma siempre las fechas en la fuente oficial.',
@@ -972,7 +972,7 @@
         textoFeriadosIntro:'Check the official holidays. Open the digital calendar or review the reference list below.',
         textoCalendario:'Digital holiday calendar',
         textoCalendarioDesc:'Google Calendar with the public holidays of the Dominican Republic.',
-        btnCalendario:'Open digital calendar →', btnMinTrabajo:'Open official calendar →',
+        btnCalendario:'Open digital calendar →', btnMinTrabajo:'Open official calendar',
         thFecha:'Date', thFeriado:'Holiday', thDia:'Day', thNota:'Note',
         noteMoved:(d)=>'Moved from ' + d, noteFixed:'Fixed date', noteWeekend:'Falls on a weekend (not moved)', nextHoliday:'Next holiday',
         notaFeriados:'Reference list based on Law 139-97 and the calendars published by the Ministry of Labor. Always verify dates with the official source.',
@@ -1062,8 +1062,8 @@
       notaHist:'Each month stores your net pay, expenses (excluding savings) and savings taken from the Salary & Budget tab. You can also type or correct amounts directly in the table.'
     });
 
-Object.assign(T.es, { otherTitle:'Otras páginas que te podrían interesar', otherSub:'Más herramientas hechas por FrancOS.', cncName:'Simulador de Código G (CNC 2D)', cncDesc:'Simula y visualiza tu código G en 2D: trayectorias, cotas, tiempos de mecanizado y ejecución paso a paso.', cncOpen:'Abrir simulador →', syncAuto:'Auto', syncBack:'Volver a auto', syncTitle:'Usar de nuevo el valor de la calculadora principal', btnResetTools:'Restablecer herramientas', confirmResetTools:'¿Restablecer los campos de todas las herramientas? Tus metas, deudas e historial mensual no se borran.' });
-    Object.assign(T.en, { otherTitle:'Other pages you might like', otherSub:'More tools made by FrancOS.', cncName:'G-Code Simulator (2D CNC)', cncDesc:'Simulate and visualize your G-code in 2D: toolpaths, dimensions, machining times and step-by-step execution.', cncOpen:'Open simulator →', syncAuto:'Auto', syncBack:'Back to auto', syncTitle:'Use the main calculator value again', btnResetTools:'Reset tools', confirmResetTools:'Reset the fields of all tools? Your goals, debts and monthly history are kept.' });
+Object.assign(T.es, { holNoData:y=>'Aún no tenemos la tabla de feriados de ' + y + ' en esta página. Consúltala en el calendario oficial con el botón «Abrir calendario oficial».', otherTitle:'Otras páginas que te podrían interesar', otherSub:'Más herramientas hechas por FrancOS.', cncName:'Simulador de Código G (CNC 2D)', cncDesc:'Simula y visualiza tu código G en 2D: trayectorias, cotas, tiempos de mecanizado y ejecución paso a paso.', cncOpen:'Abrir simulador →', syncAuto:'Auto', syncBack:'Volver a auto', syncTitle:'Usar de nuevo el valor de la calculadora principal', btnResetTools:'Restablecer herramientas', confirmResetTools:'¿Restablecer los campos de todas las herramientas? Tus metas, deudas e historial mensual no se borran.' });
+    Object.assign(T.en, { holNoData:y=>'We do not have the ' + y + ' holiday table on this page yet. See it in the official calendar with the “Open official calendar” button.', otherTitle:'Other pages you might like', otherSub:'More tools made by FrancOS.', cncName:'G-Code Simulator (2D CNC)', cncDesc:'Simulate and visualize your G-code in 2D: toolpaths, dimensions, machining times and step-by-step execution.', cncOpen:'Open simulator →', syncAuto:'Auto', syncBack:'Back to auto', syncTitle:'Use the main calculator value again', btnResetTools:'Reset tools', confirmResetTools:'Reset the fields of all tools? Your goals, debts and monthly history are kept.' });
     // ===== FERIADOS (fuente: Ministerio de Trabajo / Ley 139-97) =====
     // [fecha efectiva, clave, fecha original si fue trasladado]
     const HOL = {
@@ -1106,8 +1106,9 @@ Object.assign(T.es, { otherTitle:'Otras páginas que te podrían interesar', oth
     let state = DEFAULT_STATE();
     let currentLang = 'es';
     const HOL_YEARS = () => Object.keys(HOL).map(Number);
-    function currentHolYear() { const cy = new Date().getFullYear(), ys = HOL_YEARS(); return ys.includes(cy) ? cy : (cy < ys[0] ? ys[0] : ys[ys.length - 1]); }
-    let holYear = currentHolYear();
+    // Año en curso (aunque aún no tenga tabla); nunca antes del primer año disponible
+    function currentHolYear() { return Math.max(new Date().getFullYear(), HOL_YEARS()[0]); }
+    let holYear = currentHolYear(), holPicked = false;
     let openModal = null;
     const t = (k, ...a) => { const v = (T[currentLang][k] !== undefined ? T[currentLang][k] : T.es[k]); return typeof v === 'function' ? v(...a) : v; };
     const locale = () => currentLang === 'es' ? 'es-DO' : 'en-US';
@@ -1908,14 +1909,18 @@ Object.assign(T.es, { otherTitle:'Otras páginas que te podrían interesar', oth
 
     // ============ FERIADOS ============
     function renderHolidays() {
-      $('btnMinHol').href = 'https://mt.gob.do/ministerio-de-trabajo-informa-dias-feriados-correspondientes-al-ano-' + holYear + '/';
+      // Enlace oficial: año elegido; si no se ha elegido ninguno, el año real de hoy (aunque la tabla no lo tenga aún)
+      const offYear = holPicked ? holYear : new Date().getFullYear();
+      $('btnMinHol').href = 'https://mt.gob.do/ministerio-de-trabajo-informa-dias-feriados-correspondientes-al-ano-' + offYear + '/';
+      $('btnMinHolTxt').textContent = t('btnMinTrabajo') + ' ' + offYear + ' →';
       const sw = $('yearSwitch');
-      sw.innerHTML = Object.keys(HOL).map(y => '<button type="button" class="btn-secondary' + (+y === holYear ? ' on' : '') + '" data-year="' + y + '">' + y + '</button>').join('');
+      const maxY = new Date().getFullYear() + 1;   // el usuario solo ve hasta el año siguiente
+      sw.innerHTML = Object.keys(HOL).filter(y => +y <= maxY).map(y => '<button type="button" class="btn-secondary' + (+y === holYear ? ' on' : '') + '" data-year="' + y + '">' + y + '</button>').join('');
       const fmtD = (s, o) => { const p = pd(s); return new Date(p.y, p.m - 1, p.d).toLocaleDateString(locale(), o); };
       const today = dnum(todayObj());
       let nextFound = false;
       let html = '<thead><tr><th>' + t('thFecha') + '</th><th>' + t('thFeriado') + '</th><th>' + t('thDia') + '</th><th>' + t('thNota') + '</th></tr></thead><tbody>';
-      HOL[holYear].forEach(([date, key, orig]) => {
+      (HOL[holYear] || []).forEach(([date, key, orig]) => {
         const p = pd(date), dow = new Date(p.y, p.m - 1, p.d).getDay();
         const isPast = dnum(p) < today;
         let cls = isPast ? 'past' : '';
@@ -1924,12 +1929,13 @@ Object.assign(T.es, { otherTitle:'Otras páginas que te podrían interesar', oth
         const note = orig ? t('noteMoved', fmtD(orig, { day:'numeric', month:'long' })) : ((dow === 0 || dow === 6) ? t('noteWeekend') : t('noteFixed'));
         html += '<tr class="' + cls + '"><td>' + fmtD(date, { day:'numeric', month:'long' }) + '</td><td>' + HOL_NAMES[currentLang][key] + label + '</td><td>' + fmtD(date, { weekday:'long' }) + '</td><td>' + note + '</td></tr>';
       });
+      if (!HOL[holYear]) html += '<tr><td colspan="4" style="text-align:center;padding:22px 12px;">' + t('holNoData', holYear) + '</td></tr>';
       $('tablaFeriados').innerHTML = html + '</tbody>';
     }
 
     // ============ TABS ============
     function showTab(id) {
-      if (id === 'tab-feriados') { holYear = currentHolYear(); renderHolidays(); }
+      if (id === 'tab-feriados') { holYear = currentHolYear(); holPicked = false; renderHolidays(); }
       document.querySelectorAll('.tab-content').forEach(el => el.classList.toggle('active', el.id === id));
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === id));
     }
@@ -2071,7 +2077,7 @@ Object.assign(T.es, { otherTitle:'Otras páginas que te podrían interesar', oth
 
       document.querySelectorAll('.lang-selector button').forEach(b => b.addEventListener('click', () => { if (b.dataset.lang !== currentLang) setLanguage(b.dataset.lang); }));
       document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
-      $('yearSwitch').addEventListener('click', e => { const b = e.target.closest('[data-year]'); if (b) { holYear = +b.dataset.year; renderHolidays(); } });
+      $('yearSwitch').addEventListener('click', e => { const b = e.target.closest('[data-year]'); if (b) { holYear = +b.dataset.year; holPicked = true; renderHolidays(); } });
       initChartHover();
 
       // Tema: por defecto noche (igual que el simulador CNC)
