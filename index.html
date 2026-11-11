@@ -3,27 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pageTitle">Calculadora Laboral y Financiera RD v2.3.3 FrancOS 2.1</title>
+  <title id="pageTitle">Calculadora Laboral y Financiera RD v2.3.4 FrancOS 2.1</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%230f766e%22/%3E%3Cstop offset=%221%22 stop-color=%22%232dd4bf%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22url%28%23g%29%22/%3E%3Crect x=%2215%22 y=%229%22 width=%2234%22 height=%2246%22 rx=%226%22 fill=%22%230f172a%22/%3E%3Crect x=%2220%22 y=%2214%22 width=%2224%22 height=%2212%22 rx=%223%22 fill=%22%235eead4%22/%3E%3Cg fill=%22%23e2e8f0%22%3E%3Ccircle cx=%2224%22 cy=%2235%22 r=%223%22/%3E%3Ccircle cx=%2232%22 cy=%2235%22 r=%223%22/%3E%3Ccircle cx=%2240%22 cy=%2235%22 r=%223%22/%3E%3Ccircle cx=%2224%22 cy=%2244%22 r=%223%22/%3E%3Ccircle cx=%2232%22 cy=%2244%22 r=%223%22/%3E%3C/g%3E%3Crect x=%2237%22 y=%2241%22 width=%226%22 height=%229%22 rx=%223%22 fill=%22%232dd4bf%22/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#0f766e">
   <meta name="description" content="Calcula tu sueldo neto (AFP/ARS/ISR), presupuesto por período, tiempo laborado, vacaciones y doble sueldo en República Dominicana.">
 
   <!-- Vista previa al compartir el enlace (WhatsApp, Facebook, Telegram, LinkedIn).
-       IMPORTANTE: cambia SITE_URL por la dirección real donde publiques esta página
-       y sube preview.png (1200x630) a esa misma carpeta. -->
+       preview.png (1200x630), favicon-32.png y apple-touch-icon.png van en la misma carpeta que este archivo. -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Calculadora Laboral y Financiera RD">
   <meta property="og:locale" content="es_DO">
-  <meta property="og:title" content="Calculadora Laboral y Financiera RD v2.3.3">
+  <meta property="og:title" content="Calculadora Laboral y Financiera RD v2.3.4">
   <meta property="og:description" content="Sueldo neto (AFP/ARS/ISR), presupuesto, vacaciones, doble sueldo, horas extras, deudas y feriados de República Dominicana.">
-  <meta property="og:url" content="https://SITE_URL/">
-  <meta property="og:image" content="https://SITE_URL/preview.png">
+  <meta property="og:url" content="https://simuladorcnc2d.github.io/Calculadora-Laboral-y-Financiera-RD/">
+  <meta property="og:image" content="https://simuladorcnc2d.github.io/Calculadora-Laboral-y-Financiera-RD/preview.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Calculadora Laboral y Financiera RD con presupuesto, descuentos de ley y gráfico">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Calculadora Laboral y Financiera RD v2.3.3">
+  <meta name="twitter:title" content="Calculadora Laboral y Financiera RD v2.3.4">
   <meta name="twitter:description" content="Sueldo neto, presupuesto, vacaciones, doble sueldo, horas extras, deudas y feriados de República Dominicana.">
-  <meta name="twitter:image" content="https://SITE_URL/preview.png">
+  <meta name="twitter:image" content="https://simuladorcnc2d.github.io/Calculadora-Laboral-y-Financiera-RD/preview.png">
   <style>
     /* ===== VARIABLES Y TEMAS ===== */
     :root {
@@ -227,7 +230,8 @@
     .footer-left, .footer-right { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
     .app-footer a { color:var(--text-muted); text-decoration:none; cursor:pointer; border-bottom:1px dotted transparent; transition:color .2s, border-color .2s; }
     .app-footer a:hover { color:var(--accent); border-bottom-color:var(--accent); }
-    .app-footer .version { font-weight:600; color:var(--text-main); font-size:11px; background:var(--bg-editor); padding:2px 8px; border-radius:10px; border:1px solid var(--border-color); }
+    .app-footer .version:hover { color:var(--accent); border-color:var(--accent); }
+    .app-footer .version { font-family:inherit; cursor:pointer; transition:all .15s; font-weight:600; color:var(--text-main); font-size:11px; background:var(--bg-editor); padding:2px 8px; border-radius:10px; border:1px solid var(--border-color); }
     .status-indicator { display:flex; align-items:center; gap:5px; font-size:11px; }
     .status-dot { display:inline-block; width:8px; height:8px; background:var(--status-dot-color); border-radius:50%; animation:pulse-dot 1.5s ease-in-out infinite; }
     @keyframes pulse-dot { 0%,100%{opacity:.6;transform:scale(.9);} 50%{opacity:1;transform:scale(1.2);} }
@@ -750,10 +754,7 @@
             <strong data-t="textoCesantia">¿Necesitas calcular tu cesantía o prestaciones?</strong>
             <p data-t="textoCesantiaDesc">Consulta el portal del Ministerio de Trabajo.</p>
           </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <a href="https://mt.gob.do/" target="_blank" rel="noopener" class="btn"><span data-t="btnCesantia">Ir al Ministerio de Trabajo →</span></a>
-            <a href="https://siemprealdia.co/republica-dominicana/herramientas/calculadora-de-prestaciones-laborales-en-republica-dominicana/" target="_blank" rel="noopener" class="btn"><span data-t="btnCesantia2">Calculadora de referencia →</span></a>
-          </div>
+          <a href="https://calculo.mt.gob.do/" target="_blank" rel="noopener" class="btn"><span data-t="btnCesantia">Ir a la calculadora oficial →</span></a>
         </div>
       </div>
     </section>
@@ -770,7 +771,7 @@
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <a href="https://calendar.google.com/calendar/embed?src=es.do%23holiday%40group.v.calendar.google.com&ctz=America%2FSanto_Domingo" target="_blank" rel="noopener" class="btn"><span data-t="btnCalendario">Abrir calendario digital →</span></a>
-            <a href="https://mt.gob.do/" target="_blank" rel="noopener" class="btn"><span data-t="btnMinTrabajo">Ministerio de Trabajo →</span></a>
+            <a href="https://mt.gob.do/ministerio-de-trabajo-informa-dias-feriados-correspondientes-al-ano-2026/" target="_blank" rel="noopener" class="btn" id="btnMinHol"><span data-t="btnMinTrabajo">Abrir calendario oficial →</span></a>
           </div>
         </div>
         <div class="year-switch" id="yearSwitch"></div>
@@ -797,7 +798,7 @@
 
   <footer class="app-footer">
     <div class="footer-left">
-      <span class="version" id="versionTag">v2.3.3</span>
+      <button type="button" class="version" id="versionTag" onclick="abrirModal('changes')" title="Novedades">v2.3.4</button>
       <span class="status-indicator"><span class="status-dot"></span><span id="statusText" data-t="statusText">Sistemas estables</span></span>
       <span>|</span>
       <a onclick="abrirModal('terms')" data-t="footerTerms">Términos</a>
@@ -828,7 +829,7 @@
     // ===================================================================
     //  CALCULADORA LABORAL Y FINANCIERA RD — FrancOS 2.1
     // ===================================================================
-    const VERSION = '2.3.3';
+    const VERSION = '2.3.4';
     const STORAGE_KEY = 'francos_calc_rd_v5';
     const $ = id => document.getElementById(id);
 
@@ -885,13 +886,13 @@
         tssNote:(o)=>'Porcentajes del trabajador: AFP ' + o.afp + '% y ARS/SFS ' + o.ars + '% (editables arriba). Topes mensuales de cotización TSS 2026: AFP ' + o.capAfp + ' y SFS ' + o.capSfs + ' (salario mínimo cotizable RD$23,223). El aporte patronal no se descuenta de tu sueldo.',
         titleCesantia:'Cesantía y Prestaciones Laborales',
         textoCesantia:'¿Necesitas calcular tu cesantía o prestaciones?',
-        textoCesantiaDesc:'Consulta el Ministerio de Trabajo o usa una calculadora de referencia (no oficial).',
-        btnCesantia:'Ir al Ministerio de Trabajo →',
+        textoCesantiaDesc:'Calcula tu cesantía y prestaciones con la calculadora oficial del Ministerio de Trabajo.',
+        btnCesantia:'Ir a la calculadora oficial →',
         titleFeriados:'Calendario de Feriados (República Dominicana)',
         textoFeriadosIntro:'Consulta los feriados oficiales. Abre el calendario digital o revisa la lista de referencia de abajo.',
         textoCalendario:'Calendario digital de feriados',
         textoCalendarioDesc:'Calendario de Google con los días festivos de República Dominicana.',
-        btnCalendario:'Abrir calendario digital →', btnMinTrabajo:'Ministerio de Trabajo →',
+        btnCalendario:'Abrir calendario digital →', btnMinTrabajo:'Abrir calendario oficial →',
         thFecha:'Fecha', thFeriado:'Feriado', thDia:'Día', thNota:'Nota',
         noteMoved:(d)=>'Trasladado desde el ' + d, noteFixed:'Fecha fija', noteWeekend:'Cae en fin de semana (no se mueve)', nextHoliday:'Próximo feriado',
         notaFeriados:'Lista de referencia según la Ley 139-97 y los calendarios publicados por el Ministerio de Trabajo. Confirma siempre las fechas en la fuente oficial.',
@@ -913,7 +914,7 @@
         modalAboutTitle:'Acerca de',
         modalAbout:(v)=>'<p><strong>Calculadora Laboral y Financiera RD</strong> — v' + v + '</p><p>Herramienta para estimar sueldo neto, presupuesto por período, vacaciones, regalía pascual y tiempo laborado en República Dominicana.</p><p>Desarrollado por <strong>FrancOS</strong> — Mecatrónico. Apasionado por la electrónica, la programación y el control numérico.</p><div class="github-profile">' + GH_SVG + '<a href="https://github.com/SimuladorCNC2D" target="_blank" rel="noopener">github.com/SimuladorCNC2D</a></div><p style="margin-top:10px;">💡 <a href="mailto:francos.dev@outlook.com">Contactar por correo</a> para reportar bugs o sugerencias.</p>',
         changelogTitle:'Novedades',
-        changelog:['Iconos propios en pestañas, botones y herramientas.','«Descuento de ley aplicado» a la izquierda y opciones de AFP, ARS e ISR en un desplegable.','Nuevas herramientas: horas extras y recargos, conversor RD$ ↔ USD, metas de ahorro, deudas y préstamos, e historial mensual.','Ejemplo con datos genéricos.','Corregida la carga inicial: gastos y resultados aparecen al abrir la página.','Botón de modo día/noche idéntico al del simulador CNC (sol, luna y estrellas).','El cambio de idioma traduce toda la interfaz al instante y el selector ES/EN se desliza.','Todos los períodos visibles a la vez, con gráfico de pastel interactivo y barras comparativas.','AFP/ARS/ISR configurables y calculadora AFP/ARS en Herramientas.','Herramientas con cálculo automático y fecha de ingreso sincronizada con vacaciones.','«Cargar ejemplo» se adapta a la frecuencia elegida (mensual, quincenal o semanal) con los mismos totales mensuales.','Todas las herramientas en una sola pantalla; los botones son accesos directos que desplazan y resaltan la herramienta.','Calendario de feriados 2025 y apertura automática en el año en vigencia.','Modo lectura corregido: el candado cerrado indica que está activo y también bloquea los botones que modifican el presupuesto.','Validaciones: sin porcentajes ni montos negativos, y tope de 12 meses en el doble sueldo.','Etiqueta «Auto» en los campos que se llenan solos, con botón «Volver a auto», y botón para restablecer las herramientas.','Ejemplos más genéricos: «Luz y agua» y «Estética y gastos personales».','Nueva sección «Otras páginas que te podrían interesar», con el simulador CNC.','Vista previa con miniatura al compartir el enlace en redes y mensajería.'],
+        changelog:['Nueva sección «Otras páginas que te podrían interesar», con el simulador CNC.','Logo propio de la página en la pestaña del navegador y en favoritos.','El enlace al calendario oficial de feriados del Ministerio de Trabajo se actualiza según el año que consultas.'],
               },
       en: {
         title:'Labor & Financial Calculator', titleAccent:'DR',
@@ -965,13 +966,13 @@
         tssNote:(o)=>'Employee rates: AFP ' + o.afp + '% and ARS/SFS ' + o.ars + '% (editable above). TSS 2026 monthly contribution caps: AFP ' + o.capAfp + ' and SFS ' + o.capSfs + ' (minimum contributory salary RD$23,223). Employer contributions are not deducted from your pay.',
         titleCesantia:'Severance & Labor Benefits',
         textoCesantia:'Need to calculate your severance or benefits?',
-        textoCesantiaDesc:'Visit the Ministry of Labor or use a reference calculator (unofficial).',
-        btnCesantia:'Go to the Ministry of Labor →',
+        textoCesantiaDesc:'Calculate your severance and benefits with the Ministry of Labor\'s official calculator.',
+        btnCesantia:'Go to the official calculator →',
         titleFeriados:'Holiday Calendar (Dominican Republic)',
         textoFeriadosIntro:'Check the official holidays. Open the digital calendar or review the reference list below.',
         textoCalendario:'Digital holiday calendar',
         textoCalendarioDesc:'Google Calendar with the public holidays of the Dominican Republic.',
-        btnCalendario:'Open digital calendar →', btnMinTrabajo:'Ministry of Labor →',
+        btnCalendario:'Open digital calendar →', btnMinTrabajo:'Open official calendar →',
         thFecha:'Date', thFeriado:'Holiday', thDia:'Day', thNota:'Note',
         noteMoved:(d)=>'Moved from ' + d, noteFixed:'Fixed date', noteWeekend:'Falls on a weekend (not moved)', nextHoliday:'Next holiday',
         notaFeriados:'Reference list based on Law 139-97 and the calendars published by the Ministry of Labor. Always verify dates with the official source.',
@@ -993,7 +994,7 @@
         modalAboutTitle:'About',
         modalAbout:(v)=>'<p><strong>Labor &amp; Financial Calculator DR</strong> — v' + v + '</p><p>Tool to estimate net salary, per-period budget, vacation, Christmas bonus and time worked in the Dominican Republic.</p><p>Developed by <strong>FrancOS</strong> — Mechatronics. Passionate about electronics, programming and numerical control.</p><div class="github-profile">' + GH_SVG + '<a href="https://github.com/SimuladorCNC2D" target="_blank" rel="noopener">github.com/SimuladorCNC2D</a></div><p style="margin-top:10px;">💡 <a href="mailto:francos.dev@outlook.com">Contact by email</a> to report bugs or suggestions.</p>',
         changelogTitle:'What\'s new',
-        changelog:['Custom icons on tabs, buttons and tools.','“Statutory deduction applied” on the left, with AFP, ARS and ISR options in a dropdown.','New tools: overtime and surcharges, RD$ ↔ USD converter, savings goals, debts and loans, and monthly history.','Example with generic data.','Fixed initial load: expenses and results show up as soon as the page opens.','Day/night button identical to the CNC simulator (sun, moon and stars).','Switching language translates the whole interface instantly and the ES/EN selector slides.','All periods visible at once, with an interactive pie chart and comparison bars.','Configurable AFP/ARS/ISR and an AFP/ARS calculator in Tools.','Tools calculate automatically and the start date syncs with vacation.','“Load example” adapts to the chosen frequency (monthly, fortnightly or weekly) with the same monthly totals.','All tools on a single screen; the buttons are shortcuts that scroll to and highlight the tool.','2025 holiday calendar, opening on the current year.','Read-only mode fixed: the closed padlock means it is active, and it also blocks the buttons that change the budget.','Validation: no negative percentages or amounts, and a 12-month cap on the double salary.','“Auto” badge on self-filled fields with a “Back to auto” button, plus a button to reset the tools.','More generic examples: “Electricity & water” and “Beauty & personal expenses”.','New “Other pages you might like” section, featuring the CNC simulator.','Thumbnail preview when the link is shared on social media and messaging apps.']
+        changelog:['New “Other pages you might like” section, featuring the CNC simulator.','Custom page logo on the browser tab and in bookmarks.','The link to the Ministry of Labor\'s official holiday calendar follows the year you are viewing.']
               }
     };
 
@@ -1061,8 +1062,8 @@
       notaHist:'Each month stores your net pay, expenses (excluding savings) and savings taken from the Salary & Budget tab. You can also type or correct amounts directly in the table.'
     });
 
-Object.assign(T.es, { otherTitle:'Otras páginas que te podrían interesar', otherSub:'Más herramientas hechas por FrancOS.', cncName:'Simulador de Código G (CNC 2D)', cncDesc:'Simula y visualiza tu código G en 2D: trayectorias, cotas, tiempos de mecanizado y ejecución paso a paso.', cncOpen:'Abrir simulador →', syncAuto:'Auto', syncBack:'Volver a auto', syncTitle:'Usar de nuevo el valor de la calculadora principal', btnResetTools:'Restablecer herramientas', confirmResetTools:'¿Restablecer los campos de todas las herramientas? Tus metas, deudas e historial mensual no se borran.', btnCesantia2:'Calculadora de referencia →' });
-    Object.assign(T.en, { otherTitle:'Other pages you might like', otherSub:'More tools made by FrancOS.', cncName:'G-Code Simulator (2D CNC)', cncDesc:'Simulate and visualize your G-code in 2D: toolpaths, dimensions, machining times and step-by-step execution.', cncOpen:'Open simulator →', syncAuto:'Auto', syncBack:'Back to auto', syncTitle:'Use the main calculator value again', btnResetTools:'Reset tools', confirmResetTools:'Reset the fields of all tools? Your goals, debts and monthly history are kept.', btnCesantia2:'Reference calculator →' });
+Object.assign(T.es, { otherTitle:'Otras páginas que te podrían interesar', otherSub:'Más herramientas hechas por FrancOS.', cncName:'Simulador de Código G (CNC 2D)', cncDesc:'Simula y visualiza tu código G en 2D: trayectorias, cotas, tiempos de mecanizado y ejecución paso a paso.', cncOpen:'Abrir simulador →', syncAuto:'Auto', syncBack:'Volver a auto', syncTitle:'Usar de nuevo el valor de la calculadora principal', btnResetTools:'Restablecer herramientas', confirmResetTools:'¿Restablecer los campos de todas las herramientas? Tus metas, deudas e historial mensual no se borran.' });
+    Object.assign(T.en, { otherTitle:'Other pages you might like', otherSub:'More tools made by FrancOS.', cncName:'G-Code Simulator (2D CNC)', cncDesc:'Simulate and visualize your G-code in 2D: toolpaths, dimensions, machining times and step-by-step execution.', cncOpen:'Open simulator →', syncAuto:'Auto', syncBack:'Back to auto', syncTitle:'Use the main calculator value again', btnResetTools:'Reset tools', confirmResetTools:'Reset the fields of all tools? Your goals, debts and monthly history are kept.' });
     // ===== FERIADOS (fuente: Ministerio de Trabajo / Ley 139-97) =====
     // [fecha efectiva, clave, fecha original si fue trasladado]
     const HOL = {
@@ -1907,6 +1908,7 @@ Object.assign(T.es, { otherTitle:'Otras páginas que te podrían interesar', oth
 
     // ============ FERIADOS ============
     function renderHolidays() {
+      $('btnMinHol').href = 'https://mt.gob.do/ministerio-de-trabajo-informa-dias-feriados-correspondientes-al-ano-' + holYear + '/';
       const sw = $('yearSwitch');
       sw.innerHTML = Object.keys(HOL).map(y => '<button type="button" class="btn-secondary' + (+y === holYear ? ' on' : '') + '" data-year="' + y + '">' + y + '</button>').join('');
       const fmtD = (s, o) => { const p = pd(s); return new Date(p.y, p.m - 1, p.d).toLocaleDateString(locale(), o); };
@@ -2016,7 +2018,10 @@ Object.assign(T.es, { otherTitle:'Otras páginas que te podrían interesar', oth
       if (tipo === 'terms') { title = t('modalTermsTitle'); body = t('modalTermsContent'); }
       else if (tipo === 'about') {
         title = t('modalAboutTitle');
-        body = t('modalAbout', VERSION) + '<h3 style="font-size:14px;margin:14px 0 4px;">' + t('changelogTitle') + ' (v' + VERSION + ')</h3><ul>' + T[currentLang].changelog.map(x => '<li>' + x + '</li>').join('') + '</ul>';
+        body = t('modalAbout', VERSION);
+      } else if (tipo === 'changes') {
+        title = t('changelogTitle') + ' (v' + VERSION + ')';
+        body = '<ul>' + T[currentLang].changelog.map(x => '<li>' + x + '</li>').join('') + '</ul>';
       }
       $('modalContent').innerHTML = '<h2>' + title + '</h2><div class="modal-content">' + body + '</div>';
       $('modalOverlay').classList.add('open');
